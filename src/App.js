@@ -7,6 +7,8 @@ import TopAppBar from './components/TopAppBar';
 import { AuthProvider } from './services/auth';
 import WeeklyCalendar from './components/WeeklyCalendar';
 import RequireAuth from './components/RequireAuth';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import AdapterMoment from '@mui/lab/AdapterMoment';
 
 export default function App() {
   const theme = createTheme({
@@ -20,12 +22,14 @@ export default function App() {
     <React.Fragment>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <TopAppBar />
-          <Routes>
-            <Route path="/" element={<Navigate replace to="week" />} />
-            <Route path="login" element={<Login />} />
-            <Route path="week" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
-          </Routes>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <TopAppBar />
+            <Routes>
+              <Route path="/" element={<Navigate replace to="week" />} />
+              <Route path="login" element={<Login />} />
+              <Route path="week" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
+            </Routes>
+          </LocalizationProvider>
         </AuthProvider>
       </ThemeProvider>
     </React.Fragment>

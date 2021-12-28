@@ -6,7 +6,7 @@ import { useAuth } from '../services/auth';
 export function useHttp() {
   const { token } = useAuth();
 
-  const get = React.useCallback((url, successCallback, errorCallback=()=>{}, useAuth=false) => {
+  const get = React.useCallback((url, successCallback, errorCallback=()=>{}, useAuth=true) => {
     let config = {};
     if (useAuth) {
       config = { headers: { Authorization: "JWT " + token } }
@@ -21,7 +21,7 @@ export function useHttp() {
       });
   }, [token])
 
-  const post = React.useCallback((url, data, successCallback, errorCallback=()=>{}, useAuth=false) => {
+  const post = React.useCallback((url, data, successCallback, errorCallback=()=>{}, useAuth=true) => {
     let config = {};
     if (useAuth) {
       config = { headers: { Authorization: "JWT " + token } }
