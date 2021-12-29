@@ -4,27 +4,37 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
+import { useHttp } from '../services/http';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
+  const {patch, del} = useHttp()
+  const url = 'schedule_items/' + props.id + '/';
 
-  const handleClose = () => {
-    props.handleClose();
-  }
+  const handleDelete = React.useCallback(() => {
+    del(url, () => props.handleClose({"id": props.id, "delete": true}));
+  }, [props, del, url])
 
-  const handleDelete = React.useMemo(() => {
-    handleClose();
-  }, [])
+  const handleSave = React.useCallback(() => {
+    const payload = {
+      "name": name
+    }
+    patch(url, payload, props.handleClose)
+  }, [name, patch, props.handleClose, url])
 
-  const handleSave = React.useMemo(() => {
-    handleClose();
-  }, [])
+  const handleKeyUp = React.useCallback((e) => {
+    if (e.keyCode === 13) handleSave();
+  }, [handleSave])
+
+  React.useEffect(() => {
+    window.document.addEventListener('keyup', handleKeyUp);
+    return () => { window.document.removeEventListener('keyup', handleKeyUp); }
+  }, [handleKeyUp]);
 
   return (
-    <Dialog open={props.open} onClose={handleClose} fullWidth keepMounted>
+    <Dialog open={props.open? props.open:false} onClose={() => props.handleClose({"id": props.id, "closeOnly": true})} fullWidth keepMounted>
       <DialogTitle>Schedule Item</DialogTitle>
       <DialogContent>
         <TextField
