@@ -23,7 +23,8 @@ export default function WeeklyCalendar() {
   const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(moment());
-  const [modalOpen, setModalOpen] = React.useState({});
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalItem, setModalItem] = React.useState({"id": 0, "name": "", "type": "edit"});
 
   const gotoNextWeek = React.useCallback(() => {
     const newDate = selectedDate.clone().add(7, "days");
@@ -55,14 +56,6 @@ export default function WeeklyCalendar() {
     }
   }, [gotoPrevWeek, gotoNextWeek])
 
-  const initModalOpen = React.useCallback((scheduleItems) => {
-    let modalOpen = {};
-    for (let item of scheduleItems) {
-      modalOpen[item.id] = false;
-    }
-    setModalOpen(modalOpen);
-  }, []);
-
   const getScheduleItemsForDate = React.useCallback((scheduleItems, dateObj) => {
     let items = [];
     const searchDate = dateObj.format('YYYY-MM-DD');
@@ -72,7 +65,7 @@ export default function WeeklyCalendar() {
     return items;
   }, []);
 
-  const generateDisplayData = React.useCallback((scheduleItems, init=false) => {
+  const generateDisplayData = React.useCallback((scheduleItems) => {
     const dates = getDateObjInWeek(selectedDate);
     const days = getDaysInWeek();
     let data = [];
@@ -82,9 +75,8 @@ export default function WeeklyCalendar() {
         "day": days[i], 
         "items": getScheduleItemsForDate(scheduleItems, dates[i])})
     }
-    if (init) initModalOpen(scheduleItems);
     setDisplayData(data);
-  }, [getDateObjInWeek, getDaysInWeek, initModalOpen, selectedDate, getScheduleItemsForDate])
+  }, [getDateObjInWeek, getDaysInWeek, selectedDate, getScheduleItemsForDate])
 
   const handleRetrieveScheduleItems = React.useCallback((data) => {
     setScheduleItems(data);
@@ -97,18 +89,27 @@ export default function WeeklyCalendar() {
     get(url, handleRetrieveScheduleItems);
   }, [get, getStartEndDateObj, handleRetrieveScheduleItems]);
 
-  const openModal = (id) => {
-    modalOpen[id] = true;
-    setModalOpen({...modalOpen});
+  const openModal = (id, create=false) => {
+    if (create) {
+      setModalItem({"id": 0, "name": "", "type": "create"})
+    } else {
+      for (let item of scheduleItems) {
+        if (id === item.id) {
+          let modalItem = {...item};
+          modalItem["type"] = "edit";
+          setModalItem(modalItem);
+        }
+      }
+    }
+    setModalOpen(true);
   }
   
   const closeModal = (id) => {
-    modalOpen[id] = false;
-    setModalOpen({...modalOpen});
+    setModalOpen(false);
   }
 
   const handleModalClose = (data) => {
-    closeModal(data.id);
+    closeModal();
     let newScheduleItems = [];
     for (let item of scheduleItems) {
       if (data.delete) continue;
@@ -119,7 +120,7 @@ export default function WeeklyCalendar() {
       }
     }
     setScheduleItems(newScheduleItems);
-    generateDisplayData(newScheduleItems, false);
+    generateDisplayData(newScheduleItems);
   }
 
   React.useEffect(() => {
@@ -163,18 +164,23 @@ export default function WeeklyCalendar() {
                   {data.items.map((item) => (
                     <React.Fragment key={item.id}>
                       <Chip label={item.name} size="small" onClick={() => openModal(item.id)}></Chip>
-                      <ScheduleItemModal open={modalOpen[item.id]} id={item.id} name={item.name} handleClose={(data) => handleModalClose(data)}/>
                     </React.Fragment>
                   ))}
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={1} sm={1} md={1}>
-              <IconButton size="small" sx={{mt:2}}><AddBoxIcon fontSize="small" /></IconButton>
+              <IconButton size="small" sx={{mt:2}} onClick={() => openModal(0, true)}><AddBoxIcon fontSize="small" /></IconButton>
             </Grid>
           </React.Fragment>
         ))}
       </Grid>
+      <ScheduleItemModal 
+        open={modalOpen} 
+        id={modalItem.id} 
+        name={modalItem.name} 
+        type={modalItem.type} 
+        handleClose={(data) => handleModalClose(data)}/>
     </Container>
   )
 }

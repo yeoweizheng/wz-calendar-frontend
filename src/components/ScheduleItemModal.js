@@ -7,9 +7,12 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
 import { useHttp } from '../services/http';
+import MobileDatePicker from '@mui/lab/MobileDatePicker';
+import moment from 'moment';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
+  const [currentItemDate, setCurrentItemDate] = React.useState(moment());
   const {patch, del} = useHttp()
   const url = 'schedule_items/' + props.id + '/';
 
@@ -33,9 +36,15 @@ export default function ScheduleItemModal(props) {
     return () => { window.document.removeEventListener('keyup', handleKeyUp); }
   }, [handleKeyUp]);
 
+  React.useEffect(() => {
+    setName(props.name);
+  }, [props.name])
+
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose({"id": props.id, "closeOnly": true})} fullWidth keepMounted>
-      <DialogTitle>Schedule Item</DialogTitle>
+      <DialogTitle>
+        {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item" }
+      </DialogTitle>
       <DialogContent>
         <TextField
           label="Name"
@@ -43,6 +52,16 @@ export default function ScheduleItemModal(props) {
           fullWidth
           variant="standard"
           onChange={(e) => setName(e.target.value)}
+        />
+      </DialogContent>
+      <DialogContent sx={{pt: 0}}>
+        <MobileDatePicker
+          value={currentItemDate}
+          label="Select date"
+          onChange={() => {}}
+          renderInput={(params) => {
+            return <TextField size="small" variant="standard" fullWidth {...params} />}
+          }
         />
       </DialogContent>
       <DialogActions sx={{ pl: 2, pr: 2 }}>
