@@ -4,7 +4,7 @@ import { API_URL } from '../config';
 import { useAuth } from '../services/auth';
 
 export function useHttp() {
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   const get = React.useCallback((url, successCallback, errorCallback=()=>{}, useAuth=true) => {
     let config = {};
@@ -16,10 +16,12 @@ export function useHttp() {
         successCallback(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        try {
+          if (err.response.status === 401) logout();
+        } catch (e) {}
         errorCallback(err);
       });
-  }, [token])
+  }, [token, logout])
 
   const post = React.useCallback((url, data, successCallback, errorCallback=()=>{}, useAuth=true) => {
     let config = {};
@@ -31,10 +33,12 @@ export function useHttp() {
         successCallback(res.data);
       })
       .catch((err) => {
-        console.log(err);
+        try {
+          if (err.response.status === 401) logout();
+        } catch (e) {}
         errorCallback(err);
       });
-  }, [token])
+  }, [token, logout])
 
   return { get, post };
 }

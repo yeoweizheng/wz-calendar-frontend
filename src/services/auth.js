@@ -1,12 +1,14 @@
 import * as React from 'react';
 import axios from "axios";
 import { API_URL } from "../config";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = React.createContext({});
 
 export const AuthProvider = (props) => {
   const [username, setUsername] = React.useState(localStorage.getItem("username"));
   const [token, setToken] = React.useState(localStorage.getItem("token"));
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     localStorage.setItem("username", username);
@@ -25,10 +27,11 @@ export const AuthProvider = (props) => {
       })
   }
 
-  const logout = () => {
+  const logout = React.useCallback(() => {
     setUsername("");
     setToken("");
-  }
+    navigate("/");
+  }, [setUsername, setToken, navigate])
 
   const isAuthenticated = React.useCallback(() => {
     if (username === undefined || username === null || username === "") {
@@ -40,7 +43,7 @@ export const AuthProvider = (props) => {
 
   const authMemo = React.useMemo(
     () => ({ username, setUsername, token, setToken, login, logout, isAuthenticated }),
-    [username, token, isAuthenticated]
+    [username, token, logout, isAuthenticated]
   );
 
   return (

@@ -12,6 +12,7 @@ import moment from 'moment';
 import Stack from '@mui/material/Stack';
 import { useHttp } from '../services/http';
 import { useSwipeable } from 'react-swipeable';
+import ScheduleItemModal from './ScheduleItemModal';
 
 export default function WeeklyCalendar() {
 
@@ -19,6 +20,7 @@ export default function WeeklyCalendar() {
   const { get } = useHttp();
   const [displayData, setDisplayData] = React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(moment());
+  const [modalOpen, setModalOpen] = React.useState({});
 
   const gotoNextWeek = React.useCallback(() => {
     const newDate = selectedDate.clone().add(7, "days");
@@ -50,6 +52,13 @@ export default function WeeklyCalendar() {
     }
   }, [gotoPrevWeek, gotoNextWeek])
 
+  const initModalOpen = React.useCallback((scheduleItems) => {
+    let modalOpen = {};
+    for (let item of scheduleItems) {
+      modalOpen[item.id] = false;
+    }
+    setModalOpen(modalOpen);
+  }, []);
 
   const getScheduleItemsForDate = (scheduleItems, dateObj) => {
     let items = [];
@@ -65,10 +74,14 @@ export default function WeeklyCalendar() {
     const days = getDaysInWeek();
     let data = [];
     for (let i = 0; i < 7; i++) {
-      data.push({ "date": dates[i].format('DD MMM'), "day": days[i], "items": getScheduleItemsForDate(scheduleItems, dates[i])})
+      data.push({
+        "date": dates[i].format('DD MMM'), 
+        "day": days[i], 
+        "items": getScheduleItemsForDate(scheduleItems, dates[i])})
     }
+    initModalOpen(scheduleItems);
     setDisplayData(data);
-  }, [getDateObjInWeek, getDaysInWeek, setDisplayData, selectedDate])
+  }, [getDateObjInWeek, getDaysInWeek, initModalOpen, selectedDate])
 
   const handleRetrieveScheduleItems = React.useCallback((data) => {
     generateDisplayData(data);
@@ -79,6 +92,16 @@ export default function WeeklyCalendar() {
     const url = 'schedule_items/?start_date=' + startDateObj.format('YYYY-MM-DD') + '&end_date=' +endDateObj.format('YYYY-MM-DD');
     get(url, handleRetrieveScheduleItems);
   }, [get, getStartEndDateObj, handleRetrieveScheduleItems]);
+
+  const openModal = (id) => {
+    modalOpen[id] = true;
+    setModalOpen({...modalOpen});
+  }
+  
+  const closeModal = (id) => {
+    modalOpen[id] = false;
+    setModalOpen({...modalOpen});
+  }
 
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate);
@@ -119,7 +142,10 @@ export default function WeeklyCalendar() {
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} >
                 <CardContent sx={{ flexGrow: 1 }}>
                   {data.items.map((item) => (
-                    <Chip label={item.name} key={item.id}></Chip>
+                    <React.Fragment key={item.id}>
+                      <Chip label={item.name} onClick={() => openModal(item.id)}></Chip>
+                      <ScheduleItemModal open={modalOpen[item.id]} name={item.name} handleClose={() => closeModal(item.id)}/>
+                    </React.Fragment>
                   ))}
                 </CardContent>
               </Card>
