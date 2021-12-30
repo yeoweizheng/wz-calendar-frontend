@@ -1,7 +1,5 @@
 import * as React from 'react';
 import Container from '@mui/material/Container';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
@@ -15,6 +13,7 @@ import { useSwipeable } from 'react-swipeable';
 import ScheduleItemModal from './ScheduleItemModal';
 import IconButton from '@mui/material/IconButton';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import Box from '@mui/material/Box';
 
 export default function WeeklyCalendar() {
 
@@ -130,30 +129,28 @@ export default function WeeklyCalendar() {
         keepMounted
       />
       </Stack>
-      <Grid container sx={{mt: 2}}>
+      <Grid container sx={{mt: 2, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
-            <Grid item xs={2} sm={2} md={2}>
-              <Card sx={{ display: 'flex', flexDirection: 'column' }} >
-                <CardContent sx={{ flexGrow: 1, p: 0, mt: 2 }} >
-                  <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
-                  <Typography variant="body2" component="p" align="center">{data.day}</Typography>
-                </CardContent>
-              </Card>
+            <Grid item xs={2} sm={2} md={2} sx={{border: 1, borderColor: "grey.300"}}>
+              <Box sx={{ p: 1 }}>
+                <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
+                <Typography variant="body2" component="p" align="center">{data.day}</Typography>
+              </Box>
             </Grid>
-            <Grid item xs={9} sm={9} md={9}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} >
-                <CardContent sx={{ flexGrow: 1 }}>
-                  {data.items.map((item) => (
-                    <React.Fragment key={item.id}>
-                      <Chip label={item.name} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
-                    </React.Fragment>
-                  ))}
-                </CardContent>
-              </Card>
+            <Grid item xs={9} sm={9} md={9} sx={{border: 1, borderColor: "grey.300"}}>
+              <Box sx={{ p: 1 }}>
+                {data.items.map((item) => (
+                  <React.Fragment key={item.id}>
+                    <Chip label={item.name} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
+                  </React.Fragment>
+                ))}
+              </Box>
             </Grid>
-            <Grid item xs={1} sm={1} md={1}>
-              <IconButton size="small" sx={{mt:2}} onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
+            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300"}}>
+              <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
+                <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
+              </Box>
             </Grid>
           </React.Fragment>
         ))}
