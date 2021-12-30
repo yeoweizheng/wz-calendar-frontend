@@ -1,7 +1,7 @@
 import './App.css';
 import * as React from 'react';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import TopAppBar from './components/TopAppBar';
 import { AuthProvider } from './services/auth';
@@ -25,9 +25,8 @@ export default function App() {
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <TopAppBar />
             <Routes>
-              <Route path="/" element={<Navigate replace to="week" />} />
               <Route path="login" element={<Login />} />
-              <Route path="week" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
+              <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
             </Routes>
           </LocalizationProvider>
         </AuthProvider>

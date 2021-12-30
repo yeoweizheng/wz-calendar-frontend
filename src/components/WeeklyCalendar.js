@@ -24,7 +24,8 @@ export default function WeeklyCalendar() {
   const [displayData, setDisplayData] = React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(moment());
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [modalItem, setModalItem] = React.useState({"id": 0, "name": "", "type": "edit"});
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": moment(), "done": false}
+  const [modalItem, setModalItem] = React.useState(defaultModalItem);
 
   const gotoNextWeek = React.useCallback(() => {
     const newDate = selectedDate.clone().add(7, "days");
@@ -71,7 +72,7 @@ export default function WeeklyCalendar() {
     let data = [];
     for (let i = 0; i < 7; i++) {
       data.push({
-        "date": dates[i].format('DD MMM'), 
+        "date": dates[i],
         "day": days[i], 
         "items": getScheduleItemsForDate(scheduleItems, dates[i])})
     }
@@ -89,9 +90,10 @@ export default function WeeklyCalendar() {
     get(url, handleRetrieveScheduleItems);
   }, [get, getStartEndDateObj, handleRetrieveScheduleItems]);
 
-  const openModal = (id, create=false) => {
-    if (create) {
-      setModalItem({"id": 0, "name": "", "type": "create"})
+  const openModal = (id, date) => {
+    if (date) {  // specify date for create modal
+      defaultModalItem.date = date;
+      setModalItem(defaultModalItem);
     } else {
       for (let item of scheduleItems) {
         if (id === item.id) {
@@ -104,28 +106,9 @@ export default function WeeklyCalendar() {
     setModalOpen(true);
   }
   
-  const closeModal = (id) => {
-    setModalOpen(false);
-  }
-
-  const handleModalClose = (data) => {
-    closeModal();
-    let newScheduleItems = [];
-    for (let item of scheduleItems) {
-      if (data.delete) continue;
-      if (data.id === item.id && !data.closeOnly) {
-        newScheduleItems.push(data);
-      } else {
-        newScheduleItems.push(item);
-      }
-    }
-    setScheduleItems(newScheduleItems);
-    generateDisplayData(newScheduleItems);
-  }
-
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate]);
+  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -135,7 +118,6 @@ export default function WeeklyCalendar() {
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
       <Stack alignItems="center">
-      <Typography component="h6" variant="h6" align="center" color="text.primary" sx={{ m: 1 }} gutterBottom >Weekly Calendar</Typography>
       <MobileDatePicker
         value={selectedDate}
         label="Select week"
@@ -143,8 +125,9 @@ export default function WeeklyCalendar() {
         renderInput={(params) => {
           const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
           params['inputProps']['value'] = startDateObj.format('D MMM YY') + ' - ' + endDateObj.format('D MMM YY');
-          return <TextField size="small" {...params} />}
+          return <TextField size="small" sx={{ mt: 2 }} {...params} />}
         }
+        keepMounted
       />
       </Stack>
       <Grid container sx={{mt: 2}}>
@@ -153,7 +136,7 @@ export default function WeeklyCalendar() {
             <Grid item xs={2} sm={2} md={2}>
               <Card sx={{ display: 'flex', flexDirection: 'column' }} >
                 <CardContent sx={{ flexGrow: 1, p: 0, mt: 2 }} >
-                  <Typography variant="body2" component="p" align="center">{data.date}</Typography>
+                  <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
                   <Typography variant="body2" component="p" align="center">{data.day}</Typography>
                 </CardContent>
               </Card>
@@ -163,14 +146,14 @@ export default function WeeklyCalendar() {
                 <CardContent sx={{ flexGrow: 1 }}>
                   {data.items.map((item) => (
                     <React.Fragment key={item.id}>
-                      <Chip label={item.name} size="small" onClick={() => openModal(item.id)}></Chip>
+                      <Chip label={item.name} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
                     </React.Fragment>
                   ))}
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={1} sm={1} md={1}>
-              <IconButton size="small" sx={{mt:2}} onClick={() => openModal(0, true)}><AddBoxIcon fontSize="small" /></IconButton>
+              <IconButton size="small" sx={{mt:2}} onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
             </Grid>
           </React.Fragment>
         ))}
@@ -180,7 +163,9 @@ export default function WeeklyCalendar() {
         id={modalItem.id} 
         name={modalItem.name} 
         type={modalItem.type} 
-        handleClose={(data) => handleModalClose(data)}/>
+        date={modalItem.date}
+        done={modalItem.done}
+        handleClose={() => setModalOpen(false)} />
     </Container>
   )
 }

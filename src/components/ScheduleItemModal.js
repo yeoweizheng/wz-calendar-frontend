@@ -9,23 +9,44 @@ import Box from '@mui/material/Box';
 import { useHttp } from '../services/http';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
 import moment from 'moment';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
-  const [currentItemDate, setCurrentItemDate] = React.useState(moment());
-  const {patch, del} = useHttp()
-  const url = 'schedule_items/' + props.id + '/';
+  const [nameError, setNameError] = React.useState(false);
+  const [date, setDate] = React.useState(moment());
+  const [done, setDone] = React.useState(false);
+  const {post, patch, del} = useHttp()
+  const baseUrl = 'schedule_items/';
+  const patchUrl = baseUrl + props.id + '/';
 
   const handleDelete = React.useCallback(() => {
-    del(url, () => props.handleClose({"id": props.id, "delete": true}));
-  }, [props, del, url])
+    del(patchUrl, props.handleClose);
+  }, [props, del, patchUrl])
 
   const handleSave = React.useCallback(() => {
-    const payload = {
-      "name": name
+    if (name === "" || name === undefined || name === null) {
+      setNameError(true);
+      return;
     }
-    patch(url, payload, props.handleClose)
-  }, [name, patch, props.handleClose, url])
+    const payload = {
+      "name": name,
+      "date": date.format("YYYY-MM-DD"),
+      "done": done
+    }
+    if (props.type === "edit") {
+      patch(patchUrl, payload, props.handleClose);
+    } else {
+      post(baseUrl, payload, props.handleClose);
+    }
+  }, [name, post, patch, props.handleClose, baseUrl, patchUrl, date, props.type, done])
+
+  const handleNameChange = React.useCallback((e) => {
+    setNameError(false);
+    setName(e.target.value);
+  }, []);
 
   const handleKeyUp = React.useCallback((e) => {
     if (e.keyCode === 13) handleSave();
@@ -38,10 +59,12 @@ export default function ScheduleItemModal(props) {
 
   React.useEffect(() => {
     setName(props.name);
-  }, [props.name])
+    setDate(moment(props.date, 'YYYY-MM-DD'));
+    setDone(props.done);
+  }, [props.name, props.date, props.done])
 
   return (
-    <Dialog open={props.open? props.open:false} onClose={() => props.handleClose({"id": props.id, "closeOnly": true})} fullWidth keepMounted>
+    <Dialog open={props.open? props.open:false} onClose={props.handleClose} fullWidth keepMounted>
       <DialogTitle>
         {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item" }
       </DialogTitle>
@@ -51,21 +74,34 @@ export default function ScheduleItemModal(props) {
           value={name}
           fullWidth
           variant="standard"
-          onChange={(e) => setName(e.target.value)}
+          onChange={(e) => handleNameChange(e)}
+          required
+          error={nameError}
         />
       </DialogContent>
       <DialogContent sx={{pt: 0}}>
         <MobileDatePicker
-          value={currentItemDate}
+          value={date}
           label="Select date"
-          onChange={() => {}}
+          onChange={(value) => {setDate(value);}}
           renderInput={(params) => {
+            params['inputProps']['value'] = date.format('DD MMM YY')
             return <TextField size="small" variant="standard" fullWidth {...params} />}
           }
+          keepMounted
         />
       </DialogContent>
+      { props.type === "edit" ?
+        <DialogContent sx={{pt: 0}}>
+          <FormGroup>
+            <FormControlLabel control={<Checkbox checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />
+          </FormGroup>
+        </DialogContent> : null
+      }
       <DialogActions sx={{ pl: 2, pr: 2 }}>
-        <Button onClick={handleDelete} color="error">Delete</Button>
+        { props.type === "edit" ?
+          <Button onClick={handleDelete} color="error">Delete</Button> : null
+        }
         <Box sx={{ flexGrow: 1}} />
         <Button onClick={handleSave}>Save</Button>
       </DialogActions>
