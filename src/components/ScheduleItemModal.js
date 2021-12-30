@@ -15,6 +15,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
+  const [nameInput, setNameInput] = React.useState();
   const [nameError, setNameError] = React.useState(false);
   const [date, setDate] = React.useState(moment());
   const [done, setDone] = React.useState(false);
@@ -61,7 +62,8 @@ export default function ScheduleItemModal(props) {
     setName(props.name);
     setDate(moment(props.date, 'YYYY-MM-DD'));
     setDone(props.done);
-  }, [props.name, props.date, props.done])
+    if (nameInput && props.type === "create") nameInput.focus();
+  }, [props.name, props.date, props.done, props.type, nameInput])
 
   return (
     <Dialog open={props.open? props.open:false} onClose={props.handleClose} fullWidth keepMounted>
@@ -77,6 +79,7 @@ export default function ScheduleItemModal(props) {
           onChange={(e) => handleNameChange(e)}
           required
           error={nameError}
+          inputRef={el => {setNameInput(el)}}
         />
       </DialogContent>
       <DialogContent sx={{pt: 0}}>

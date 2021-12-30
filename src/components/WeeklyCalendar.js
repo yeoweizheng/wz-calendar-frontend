@@ -19,11 +19,12 @@ export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
+  const today = moment();
   const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
-  const [selectedDate, setSelectedDate] = React.useState(moment());
+  const [selectedDate, setSelectedDate] = React.useState(today);
   const [modalOpen, setModalOpen] = React.useState(false);
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": moment(), "done": false}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
 
   const gotoNextWeek = React.useCallback(() => {
@@ -132,13 +133,13 @@ export default function WeeklyCalendar() {
       <Grid container sx={{mt: 2, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
-            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300"}}>
+            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
                 <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
                 <Typography variant="body2" component="p" align="center">{data.day}</Typography>
               </Box>
             </Grid>
-            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300"}}>
+            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
@@ -147,7 +148,7 @@ export default function WeeklyCalendar() {
                 ))}
               </Box>
             </Grid>
-            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300"}}>
+            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
               <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
                 <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
               </Box>
