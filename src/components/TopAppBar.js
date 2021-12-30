@@ -17,7 +17,7 @@ export default function TopAppBar() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div"> WZCalendar </Typography>
+        <Typography variant="h6" component="div"> WZ Calendar </Typography>
         <Box sx={{ flexGrow: 1 }} />
         { isAuthenticated() ?  
           <Button color="inherit" onClick={logoutHandler}>Logout</Button>
