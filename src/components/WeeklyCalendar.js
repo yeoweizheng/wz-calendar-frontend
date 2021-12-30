@@ -132,13 +132,13 @@ export default function WeeklyCalendar() {
       <Grid container sx={{mt: 2, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
-            <Grid item xs={2} sm={2} md={2} sx={{border: 1, borderColor: "grey.300"}}>
+            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300"}}>
               <Box sx={{ p: 1 }}>
                 <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
                 <Typography variant="body2" component="p" align="center">{data.day}</Typography>
               </Box>
             </Grid>
-            <Grid item xs={9} sm={9} md={9} sx={{border: 1, borderColor: "grey.300"}}>
+            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300"}}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
