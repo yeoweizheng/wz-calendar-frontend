@@ -18,6 +18,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 
 export default function WeeklyCalendar() {
 
@@ -189,6 +190,11 @@ export default function WeeklyCalendar() {
           </React.Fragment>
         ))}
       </Grid>
+      { selectedDate.startOf("week").isSame(today.startOf("week")) ? null :
+        <Stack alignItems="center">
+          <Button variant="outlined" size="small" sx={{mt: 2}} onClick={() => setSelectedDate(today)}>Current week</Button>
+        </Stack>
+      }
       <ScheduleItemModal 
         open={modalOpen} 
         id={modalItem.id} 
