@@ -13,6 +13,8 @@ import { useSwipeable } from 'react-swipeable';
 import ScheduleItemModal from './ScheduleItemModal';
 import IconButton from '@mui/material/IconButton';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
 
 export default function WeeklyCalendar() {
@@ -118,17 +120,21 @@ export default function WeeklyCalendar() {
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
       <Stack alignItems="center">
-      <MobileDatePicker
-        value={selectedDate}
-        label="Select week"
-        onChange={(value) => {setSelectedDate(value);}}
-        renderInput={(params) => {
-          const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
-          params['inputProps']['value'] = startDateObj.format('D MMM YY') + ' - ' + endDateObj.format('D MMM YY');
-          return <TextField size="small" sx={{ mt: 2 }} {...params} />}
-        }
-        keepMounted
-      />
+        <Stack direction="row">
+          <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
+          <MobileDatePicker
+            value={selectedDate}
+            label="Select week"
+            onChange={(value) => {setSelectedDate(value);}}
+            renderInput={(params) => {
+              const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
+              params['inputProps']['value'] = startDateObj.format('D MMM YY') + ' - ' + endDateObj.format('D MMM YY');
+              return <TextField size="small" sx={{ mt: 2 }} {...params} />}
+            }
+            keepMounted
+          />
+          <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoNextWeek()}><ArrowForwardIcon /></IconButton>
+        </Stack>
       </Stack>
       <Grid container sx={{mt: 2, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
