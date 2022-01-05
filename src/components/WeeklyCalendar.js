@@ -164,7 +164,7 @@ export default function WeeklyCalendar() {
           <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoNextWeek()}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Grid container sx={{mt: 2, border: 1, borderColor: "grey.300"}}>
+      <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
             <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
@@ -192,7 +192,7 @@ export default function WeeklyCalendar() {
       </Grid>
       { selectedDate.startOf("week").isSame(today.startOf("week")) ? null :
         <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 2}} onClick={() => setSelectedDate(today)}>Current week</Button>
+          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDate(today)}>Current week</Button>
         </Stack>
       }
       <ScheduleItemModal 
