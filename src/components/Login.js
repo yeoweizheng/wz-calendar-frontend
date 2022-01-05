@@ -42,11 +42,11 @@ export default function Login() {
       </Snackbar>
       <Box
         sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
-        <Typography component="h6" variant="h6" sx={{m: 2}}>Login</Typography>
+        <Typography component="h6" variant="h6" sx={{mt: 2}}>Login</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField size="small" margin="normal" required fullWidth id="username" label="Username" name="username" autoComplete="username" autoFocus />
           <TextField size="small" margin="normal" required fullWidth name="password" label="Password" type ="password" id="password" autoComplete="current-password" />
-          <Button type ="submit" size="small" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} > Login </Button>
+          <Button type ="submit" fullWidth variant="contained" sx={{ mt: 2 }} > Login </Button>
         </Box>
       </Box>
     </Container>

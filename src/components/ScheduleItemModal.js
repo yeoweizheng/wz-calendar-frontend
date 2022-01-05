@@ -88,7 +88,7 @@ export default function ScheduleItemModal(props) {
           label="Select date"
           onChange={(value) => {setDate(value);}}
           renderInput={(params) => {
-            params['inputProps']['value'] = date.format('D MMM YY')
+            params['inputProps']['value'] = date.format('D MMM YY (ddd)')
             return <TextField size="small" variant="standard" fullWidth {...params} />}
           }
           keepMounted
