@@ -28,16 +28,19 @@ export default function WeeklyCalendar() {
   const [modalOpen, setModalOpen] = React.useState(false);
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
+  const [loading, setLoading] = React.useState(true);
 
   const gotoNextWeek = React.useCallback(() => {
+    if (loading) return;
     const newDate = selectedDate.clone().add(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate])
+  }, [selectedDate, loading])
 
   const gotoPrevWeek = React.useCallback(() => {
+    if (loading) return;
     const newDate = selectedDate.clone().subtract(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate])
+  }, [selectedDate, loading])
 
   const handleSwipe = React.useCallback((e) => {
     if (e.dir === "Left") {
@@ -79,6 +82,7 @@ export default function WeeklyCalendar() {
         "items": getScheduleItemsForDate(scheduleItems, dates[i])})
     }
     setDisplayData(data);
+    setLoading(false);
   }, [getDateObjInWeek, getDaysInWeek, selectedDate, getScheduleItemsForDate])
 
   const handleRetrieveScheduleItems = React.useCallback((data) => {
@@ -87,6 +91,7 @@ export default function WeeklyCalendar() {
   }, [setScheduleItems, generateDisplayData]);
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
+    setLoading(true);
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
     const url = 'schedule_items/?start_date=' + startDateObj.format('YYYY-MM-DD') + '&end_date=' +endDateObj.format('YYYY-MM-DD');
     get(url, handleRetrieveScheduleItems);
