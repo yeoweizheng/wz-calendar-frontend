@@ -24,8 +24,8 @@ export default function ScheduleItemModal(props) {
   const patchUrl = baseUrl + props.id + '/';
 
   const handleDelete = React.useCallback(() => {
-    del(patchUrl, props.handleClose);
-  }, [props, del, patchUrl])
+    del(patchUrl, () => props.handleClose("Deleted " + name + " [" + date.format("D-MMM-YY ddd") + "]", "error"));
+  }, [props, date, name, del, patchUrl])
 
   const handleSave = React.useCallback(() => {
     if (name === "" || name === undefined || name === null) {
@@ -38,11 +38,11 @@ export default function ScheduleItemModal(props) {
       "done": done
     }
     if (props.type === "edit") {
-      patch(patchUrl, payload, props.handleClose);
+      patch(patchUrl, payload, (data) => props.handleClose("Updated " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
     } else {
-      post(baseUrl, payload, props.handleClose);
+      post(baseUrl, payload, (data) => props.handleClose("Created " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
     }
-  }, [name, post, patch, props.handleClose, baseUrl, patchUrl, date, props.type, done])
+  }, [name, post, patch, props, baseUrl, patchUrl, date, done])
 
   const handleNameChange = React.useCallback((e) => {
     setNameError(false);
@@ -66,7 +66,7 @@ export default function ScheduleItemModal(props) {
   }, [props.name, props.date, props.done, props.type, nameInput])
 
   return (
-    <Dialog open={props.open? props.open:false} onClose={props.handleClose} fullWidth keepMounted>
+    <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
       <DialogTitle>
         {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item" }
       </DialogTitle>

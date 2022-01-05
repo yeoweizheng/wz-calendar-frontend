@@ -16,6 +16,8 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 export default function WeeklyCalendar() {
 
@@ -29,18 +31,21 @@ export default function WeeklyCalendar() {
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [loading, setLoading] = React.useState(true);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false)
+  const [snackbarMessage, setSnackbarMessage] = React.useState("")
+  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
 
   const gotoNextWeek = React.useCallback(() => {
-    if (loading) return;
+    if (loading || modalOpen) return;
     const newDate = selectedDate.clone().add(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate, loading])
+  }, [selectedDate, loading, modalOpen])
 
   const gotoPrevWeek = React.useCallback(() => {
-    if (loading) return;
+    if (loading || modalOpen) return;
     const newDate = selectedDate.clone().subtract(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate, loading])
+  }, [selectedDate, loading, modalOpen])
 
   const handleSwipe = React.useCallback((e) => {
     if (e.dir === "Left") {
@@ -112,6 +117,15 @@ export default function WeeklyCalendar() {
     }
     setModalOpen(true);
   }
+
+  const handleModalClose = React.useCallback((alertMsg=null, severity=null) => {
+    if (alertMsg !== null && severity !== null) {
+      setSnackbarOpen(true);
+      setSnackbarMessage(alertMsg);
+      setSnackbarSeverity(severity);
+    }
+    setModalOpen(false);
+  }, [setSnackbarOpen, setSnackbarMessage, setSnackbarSeverity])
   
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
@@ -124,6 +138,14 @@ export default function WeeklyCalendar() {
 
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
+      <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        autoHideDuration={3000}>
+          <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+            {snackbarMessage}
+          </Alert>
+      </Snackbar>
       <Stack alignItems="center">
         <Stack direction="row">
           <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
@@ -174,7 +196,7 @@ export default function WeeklyCalendar() {
         type={modalItem.type} 
         date={modalItem.date}
         done={modalItem.done}
-        handleClose={() => setModalOpen(false)} />
+        handleClose={(alertMsg, severity) => handleModalClose(alertMsg, severity)} />
     </Container>
   )
 }
