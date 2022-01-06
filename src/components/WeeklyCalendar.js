@@ -127,6 +127,15 @@ export default function WeeklyCalendar() {
     }
     setModalOpen(false);
   }, [setSnackbarOpen, setSnackbarMessage, setSnackbarSeverity])
+
+  const truncateIfTooLong = React.useCallback((text) => {
+    const max_length = 33;
+    if (text.length > 33) {
+      return text.substr(0, max_length-3) + "...";
+    } else {
+      return text;
+    }
+  }, [])
   
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
@@ -177,7 +186,7 @@ export default function WeeklyCalendar() {
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
-                    <Chip label={item.name} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
+                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
                   </React.Fragment>
                 ))}
               </Box>
