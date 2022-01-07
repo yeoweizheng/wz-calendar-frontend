@@ -1,7 +1,7 @@
 import * as React from 'react';
 import axios from "axios";
 import { API_URL } from "../config";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const AuthContext = React.createContext({});
 
@@ -9,6 +9,8 @@ export const AuthProvider = (props) => {
   const [username, setUsername] = React.useState(localStorage.getItem("username"));
   const [token, setToken] = React.useState(localStorage.getItem("token"));
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromUrl = location.state?.fromLocation?.pathname || "/";
 
   React.useEffect(() => {
     localStorage.setItem("username", username);
@@ -22,7 +24,6 @@ export const AuthProvider = (props) => {
       successCallback();
     })
       .catch((err) => {
-        console.log(err);
         failureCallback();
       })
   }
@@ -30,8 +31,8 @@ export const AuthProvider = (props) => {
   const logout = React.useCallback(() => {
     setUsername("");
     setToken("");
-    navigate("/");
-  }, [setUsername, setToken, navigate])
+    if (fromUrl !== "/login" && fromUrl !== "/") navigate("/");
+  }, [setUsername, setToken, navigate, fromUrl])
 
   const isAuthenticated = React.useCallback(() => {
     if (username === undefined || username === null || username === "") {

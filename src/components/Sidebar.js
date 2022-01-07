@@ -99,10 +99,13 @@ export default function Sidebar(props) {
               <ListItemIcon><AddBoxIcon /></ListItemIcon>
               <ListItemText primary="New Tag" />
             </ListItem>
-            <ListItem button key="editTag" onClick={() => openTagModal("edit")}>
-              <ListItemIcon><EditIcon /></ListItemIcon>
-              <ListItemText primary="Edit Tag" />
-            </ListItem>
+            {tags.length > 2 ? 
+              <ListItem button key="editTag" onClick={() => openTagModal("edit")}>
+                <ListItemIcon><EditIcon /></ListItemIcon>
+                <ListItemText primary="Edit Tag" />
+              </ListItem>
+              : null
+            }
           </List>
         </Box>
       </Drawer>
