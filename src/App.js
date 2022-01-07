@@ -9,6 +9,8 @@ import WeeklyCalendar from './components/WeeklyCalendar';
 import RequireAuth from './components/RequireAuth';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterMoment from '@mui/lab/AdapterMoment';
+import { SidebarProvider } from './services/sidebar';
+import Sidebar from './components/Sidebar';
 
 export default function App() {
   const theme = createTheme({
@@ -22,13 +24,16 @@ export default function App() {
     <React.Fragment>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
-            <TopAppBar />
-            <Routes>
-              <Route path="login" element={<Login />} />
-              <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
-            </Routes>
-          </LocalizationProvider>
+          <SidebarProvider>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
+              <TopAppBar />
+              <Sidebar />
+              <Routes>
+                <Route path="login" element={<Login />} />
+                <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
+              </Routes>
+            </LocalizationProvider>
+          </SidebarProvider>
         </AuthProvider>
       </ThemeProvider>
     </React.Fragment>

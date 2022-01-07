@@ -12,6 +12,11 @@ import moment from 'moment';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { useSidebar } from '../services/sidebar';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
@@ -22,6 +27,9 @@ export default function ScheduleItemModal(props) {
   const {post, patch, del} = useHttp()
   const baseUrl = 'schedule_items/';
   const patchUrl = baseUrl + props.id + '/';
+  const { tags } = useSidebar();
+  const [ selectedTagId, setSelectedTagId ] = React.useState("u");
+  const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
 
   const handleDelete = React.useCallback(() => {
     del(patchUrl, () => props.handleClose("Deleted " + name + " [" + date.format("D-MMM-YY ddd") + "]", "error"));
@@ -32,17 +40,19 @@ export default function ScheduleItemModal(props) {
       setNameError(true);
       return;
     }
+    const tagId = selectedTagId === "u" ? null : selectedTagId;
     const payload = {
       "name": name,
       "date": date.format("YYYY-MM-DD"),
-      "done": done
+      "done": done,
+      "tag": tagId
     }
     if (props.type === "edit") {
       patch(patchUrl, payload, (data) => props.handleClose("Updated " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
     } else {
       post(baseUrl, payload, (data) => props.handleClose("Created " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
     }
-  }, [name, post, patch, props, baseUrl, patchUrl, date, done])
+  }, [name, post, patch, props, baseUrl, patchUrl, date, done, selectedTagId])
 
   const handleNameChange = React.useCallback((e) => {
     setNameError(false);
@@ -53,6 +63,11 @@ export default function ScheduleItemModal(props) {
     if (e.keyCode === 13) handleSave();
   }, [handleSave])
 
+  const handleSelectedTagId = React.useCallback((e) => {
+    setSelectedTagId(e.target.value);
+    setTagMenuOpen(false);
+  }, [setSelectedTagId, setTagMenuOpen])
+
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
     return () => { window.document.removeEventListener('keyup', handleKeyUp); }
@@ -60,10 +75,13 @@ export default function ScheduleItemModal(props) {
 
   React.useEffect(() => {
     setName(props.name);
+    setNameError(false);
     setDate(moment(props.date, 'YYYY-MM-DD'));
     setDone(props.done);
+    const tag = props.tag === null ? "u": props.tag;
+    setSelectedTagId(tag);
     if (nameInput && props.type === "create") nameInput.focus();
-  }, [props.name, props.date, props.done, props.type, nameInput])
+  }, [props.name, props.date, props.done, props.type, props.tag, nameInput])
 
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
@@ -93,6 +111,23 @@ export default function ScheduleItemModal(props) {
           }
           keepMounted
         />
+      </DialogContent>
+      <DialogContent sx={{pt: 0}}>
+        <FormControl fullWidth>
+          <InputLabel size="small">Tag</InputLabel>
+          <Select size="small" 
+            open={tagMenuOpen}
+            value={selectedTagId} 
+            onChange={(e) => handleSelectedTagId(e)}
+            onOpen={() => setTagMenuOpen(true)}
+            onClose={() => setTagMenuOpen(false)}
+            >
+            {tags.map((tag) => (
+              tag.id !== "a"?
+              <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
+            ))}
+          </Select>
+        </FormControl>
       </DialogContent>
       { props.type === "edit" ?
         <DialogContent sx={{pt: 0}}>

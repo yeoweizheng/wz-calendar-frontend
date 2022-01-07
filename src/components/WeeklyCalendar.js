@@ -19,6 +19,7 @@ import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import { useSidebar } from '../services/sidebar';
 
 export default function WeeklyCalendar() {
 
@@ -29,24 +30,25 @@ export default function WeeklyCalendar() {
   const [displayData, setDisplayData] = React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(today);
   const [modalOpen, setModalOpen] = React.useState(false);
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [loading, setLoading] = React.useState(true);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false)
   const [snackbarMessage, setSnackbarMessage] = React.useState("")
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
+  const {selectedTagId, tagModalOpen} = useSidebar();
 
   const gotoNextWeek = React.useCallback(() => {
-    if (loading || modalOpen) return;
+    if (loading || modalOpen || tagModalOpen) return;
     const newDate = selectedDate.clone().add(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate, loading, modalOpen])
+  }, [selectedDate, loading, modalOpen, tagModalOpen])
 
   const gotoPrevWeek = React.useCallback(() => {
-    if (loading || modalOpen) return;
+    if (loading || modalOpen || tagModalOpen) return;
     const newDate = selectedDate.clone().subtract(7, "days");
     setSelectedDate(newDate);
-  }, [selectedDate, loading, modalOpen])
+  }, [selectedDate, loading, modalOpen, tagModalOpen])
 
   const handleSwipe = React.useCallback((e) => {
     if (e.dir === "Left") {
@@ -99,9 +101,12 @@ export default function WeeklyCalendar() {
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     setLoading(true);
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
-    const url = 'schedule_items/?start_date=' + startDateObj.format('YYYY-MM-DD') + '&end_date=' +endDateObj.format('YYYY-MM-DD');
+    let url = 'schedule_items/?start_date=' + startDateObj.format('YYYY-MM-DD') + '&end_date=' +endDateObj.format('YYYY-MM-DD');
+    if (selectedTagId !== "a") {
+      url += "&tag=" + selectedTagId
+    }
     get(url, handleRetrieveScheduleItems);
-  }, [get, getStartEndDateObj, handleRetrieveScheduleItems]);
+  }, [get, getStartEndDateObj, handleRetrieveScheduleItems, selectedTagId]);
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -139,7 +144,7 @@ export default function WeeklyCalendar() {
   
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen]);
+  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -211,6 +216,7 @@ export default function WeeklyCalendar() {
         type={modalItem.type} 
         date={modalItem.date}
         done={modalItem.done}
+        tag={modalItem.tag}
         handleClose={(alertMsg, severity) => handleModalClose(alertMsg, severity)} />
     </Container>
   )
