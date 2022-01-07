@@ -18,7 +18,7 @@ export default function TagModal(props) {
   const [nameInput, setNameInput] = React.useState();
   const [nameError, setNameError] = React.useState(false);
   const {tags, tagModalOpen} = useSidebar();
-  const [selectedTagId, setSelectedTagId] = React.useState();
+  const [selectedTagId, setSelectedTagId] = React.useState("");
   const [tagMenuOpen, setTagMenuOpen] = React.useState(false);
   const {post, patch, del} = useHttp()
   const baseUrl = 'tags/';
@@ -34,6 +34,7 @@ export default function TagModal(props) {
   }, [tags])
 
   const handleDelete = React.useCallback(() => {
+    if (selectedTagId === "" || selectedTagId === undefined || selectedTagId === null) return;
     const patchUrl = baseUrl + selectedTagId + '/';
     del(patchUrl, () => props.handleClose("Deleted " + getTagName(selectedTagId), "error"), 
       () => props.handleClose("Error deleting " + getTagName(selectedTagId), "error"));
@@ -67,7 +68,7 @@ export default function TagModal(props) {
   React.useEffect(() => {
     setName("");
     setNameError(false);
-    setSelectedTagId(tags[1].id)
+    setSelectedTagId("")
     if (nameInput && props.type === "create") nameInput.focus();
   }, [tagModalOpen, setSelectedTagId, tags, nameInput, props.type])
 

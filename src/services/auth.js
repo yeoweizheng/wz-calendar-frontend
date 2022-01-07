@@ -17,7 +17,7 @@ export const AuthProvider = (props) => {
     localStorage.setItem("token", token);
   }, [username, token]);
 
-  const login = (username, password, successCallback, failureCallback) => {
+  const login = React.useCallback((username, password, successCallback, failureCallback) => {
     return axios.post(API_URL + "token/", { username, password }).then(res => {
       setUsername(username);
       setToken(res.data.token);
@@ -26,7 +26,7 @@ export const AuthProvider = (props) => {
       .catch((err) => {
         failureCallback();
       })
-  }
+  }, [])
 
   const logout = React.useCallback(() => {
     setUsername("");
@@ -44,7 +44,7 @@ export const AuthProvider = (props) => {
 
   const authMemo = React.useMemo(
     () => ({ username, setUsername, token, setToken, login, logout, isAuthenticated }),
-    [username, token, logout, isAuthenticated]
+    [username, token, login, logout, isAuthenticated]
   );
 
   return (

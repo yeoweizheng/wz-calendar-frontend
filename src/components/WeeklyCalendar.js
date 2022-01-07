@@ -20,6 +20,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useSidebar } from '../services/sidebar';
+import Sidebar from './Sidebar';
 
 export default function WeeklyCalendar() {
 
@@ -144,7 +145,7 @@ export default function WeeklyCalendar() {
   
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId]);
+  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -153,6 +154,7 @@ export default function WeeklyCalendar() {
 
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
+      <Sidebar />
       <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
