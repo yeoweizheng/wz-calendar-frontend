@@ -111,8 +111,10 @@ export default function WeeklyCalendar() {
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
-      defaultModalItem.date = date;
-      setModalItem(defaultModalItem);
+      let modalItem = {...defaultModalItem};
+      modalItem.date = date;
+      modalItem.tag = selectedTagId === "a"? "u" : selectedTagId;
+      setModalItem(modalItem);
     } else {
       for (let item of scheduleItems) {
         if (id === item.id) {
