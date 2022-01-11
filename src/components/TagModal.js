@@ -70,7 +70,7 @@ export default function TagModal(props) {
     setNameError(false);
     setSelectedTagId("")
     if (nameInput && props.type === "create") nameInput.focus();
-  }, [tagModalOpen, setSelectedTagId, tags, nameInput, props.type])
+  }, [tagModalOpen, setSelectedTagId, tags, nameInput, props.type, props.open])
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);

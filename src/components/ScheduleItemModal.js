@@ -81,7 +81,7 @@ export default function ScheduleItemModal(props) {
     const tag = props.tag === null ? "u": props.tag;
     setSelectedTagId(tag);
     if (nameInput && props.type === "create") nameInput.focus();
-  }, [props.name, props.date, props.done, props.type, props.tag, nameInput])
+  }, [props.name, props.date, props.done, props.type, props.tag, nameInput, props.open])
 
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
