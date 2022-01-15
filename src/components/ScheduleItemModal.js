@@ -19,6 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
@@ -90,7 +91,9 @@ export default function ScheduleItemModal(props) {
       <DialogTitle>
         <Box sx={{display: "flex"}}>
           <Box sx={{ flexGrow: 1}}>
-            {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item"}
+            <Typography variant="h6" component="h6" sx={{mt: 0.5}}>
+              {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item"}
+            </Typography>
           </Box>
           <Box>
             <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>

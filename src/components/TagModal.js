@@ -14,6 +14,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
 
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
@@ -84,7 +85,9 @@ export default function TagModal(props) {
       <DialogTitle>
         <Box sx={{display: "flex"}}>
           <Box sx={{ flexGrow: 1}}>
-            {props.type === "create" ? "Create Tag" : "Edit Tag"}
+            <Typography variant="h6" component="h6" sx={{mt: 0.5}}>
+              {props.type === "create" ? "Create Tag" : "Edit Tag"}
+            </Typography>
           </Box>
           <Box>
             <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>
