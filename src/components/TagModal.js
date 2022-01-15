@@ -12,6 +12,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
@@ -80,7 +82,14 @@ export default function TagModal(props) {
   return (
     <Dialog open={props.open ? props.open : false} onClose={() => props.handleClose()} fullWidth keepMounted>
       <DialogTitle>
-        {props.type === "create" ? "Create Tag" : "Edit Tag"}
+        <Box sx={{display: "flex"}}>
+          <Box sx={{ flexGrow: 1}}>
+            {props.type === "create" ? "Create Tag" : "Edit Tag"}
+          </Box>
+          <Box>
+            <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>
+          </Box>
+        </Box>
       </DialogTitle>
       <DialogContent>
         {props.type === "create" ? null :

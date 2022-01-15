@@ -17,6 +17,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
@@ -86,7 +88,14 @@ export default function ScheduleItemModal(props) {
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
       <DialogTitle>
-        {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item" }
+        <Box sx={{display: "flex"}}>
+          <Box sx={{ flexGrow: 1}}>
+            {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item"}
+          </Box>
+          <Box>
+            <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>
+          </Box>
+        </Box>
       </DialogTitle>
       <DialogContent>
         <TextField
