@@ -21,6 +21,7 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useSidebar } from '../services/sidebar';
 import Sidebar from './Sidebar';
+import { useCustomDay } from '../services/customday';
 
 export default function WeeklyCalendar() {
 
@@ -38,38 +39,45 @@ export default function WeeklyCalendar() {
   const [snackbarMessage, setSnackbarMessage] = React.useState("")
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
   const {selectedTagId, tagModalOpen} = useSidebar();
+  const [datePickerOpen, setDatePickerOpen] = React.useState(false);
+  const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
+
+  const setSelectedDateForAll = React.useCallback((date) => {
+    setSelectedDate(date);
+    setCustomDayValue(date);
+  }, [setSelectedDate, setCustomDayValue])
 
   const gotoNextWeek = React.useCallback(() => {
-    if (loading || modalOpen || tagModalOpen) return;
     const newDate = selectedDate.clone().add(7, "days");
-    setSelectedDate(newDate);
-  }, [selectedDate, loading, modalOpen, tagModalOpen])
+    setSelectedDateForAll(newDate);
+  }, [setSelectedDateForAll, selectedDate])
 
   const gotoPrevWeek = React.useCallback(() => {
-    if (loading || modalOpen || tagModalOpen) return;
     const newDate = selectedDate.clone().subtract(7, "days");
-    setSelectedDate(newDate);
-  }, [selectedDate, loading, modalOpen, tagModalOpen])
+    setSelectedDateForAll(newDate);
+  }, [setSelectedDateForAll, selectedDate])
 
   const handleSwipe = React.useCallback((e) => {
+    if (loading || modalOpen || tagModalOpen || datePickerOpen) return;
     if (e.dir === "Left") {
       gotoNextWeek();
     } else if (e.dir === "Right") {
       gotoPrevWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, tagModalOpen, datePickerOpen])
 
   const swipeHandler = useSwipeable({
     onSwiped: (e) => handleSwipe(e)
   })
 
   const handleKeyUp = React.useCallback((e) => {
+    if (loading || modalOpen || tagModalOpen || datePickerOpen) return;
     if (e.keyCode === 37) {
       gotoPrevWeek();
     } else if (e.keyCode === 39) {
       gotoNextWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, tagModalOpen, datePickerOpen])
 
   const getScheduleItemsForDate = React.useCallback((scheduleItems, dateObj) => {
     let items = [];
@@ -171,7 +179,11 @@ export default function WeeklyCalendar() {
           <MobileDatePicker
             value={selectedDate}
             label="Select week"
-            onChange={(value) => {setSelectedDate(value);}}
+            onChange={(value) => {setCustomDayValue(value)}}
+            onAccept={(value) => {setSelectedDateForAll(value)}}
+            onOpen={() => setDatePickerOpen(true)}
+            onClose={() => setDatePickerOpen(false)}
+            renderDay={renderWeekPickerDay}
             renderInput={(params) => {
               const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
               params['inputProps']['value'] = startDateObj.format('D MMM YY') + ' - ' + endDateObj.format('D MMM YY');
@@ -208,9 +220,9 @@ export default function WeeklyCalendar() {
           </React.Fragment>
         ))}
       </Grid>
-      { selectedDate.startOf("week").isSame(today.startOf("week")) ? null :
+      { selectedDate.clone().startOf("week").isSame(today.clone().startOf("week"), "day") ? null :
         <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDate(today)}>Current week</Button>
+          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today)}>Current week</Button>
         </Stack>
       }
       <ScheduleItemModal 

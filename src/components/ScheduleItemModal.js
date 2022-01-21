@@ -116,7 +116,8 @@ export default function ScheduleItemModal(props) {
         <MobileDatePicker
           value={date}
           label="Select date"
-          onChange={(value) => {setDate(value);}}
+          onChange={() => {}}
+          onAccept={(value) => {setDate(value)}}
           renderInput={(params) => {
             params['inputProps']['value'] = date.format('D MMM YY (ddd)')
             return <TextField size="small" variant="standard" fullWidth {...params} />}

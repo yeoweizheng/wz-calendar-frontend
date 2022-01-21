@@ -21,7 +21,7 @@ export function useCalendar() {
   }, [])
   const getStartEndDateObj = React.useCallback((selectedDate) => {
     let startDateObj = selectedDate.clone().startOf("week");
-    let endDateObj = startDateObj.clone().add(6, "days");
+    let endDateObj = selectedDate.clone().endOf("week");
     return [startDateObj, endDateObj];
   }, []);
   return { getDateObjInWeek, getDaysInWeek, getStartEndDateObj }
