@@ -37,7 +37,7 @@ export default function Login() {
       <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
         open={loginFailedAlertOpen}
         onClose={() => setLoginFailedAlertOpen(false)}
-        autoHideDuration={3000}>
+        autoHideDuration={1000}>
           <Alert onClose={() => setLoginFailedAlertOpen(false)} severity="error">Login failed.</Alert>
       </Snackbar>
       <Box

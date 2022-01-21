@@ -3,7 +3,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from "../services/auth";
@@ -11,12 +10,8 @@ import { useSidebar } from '../services/sidebar';
 
 export default function TopAppBar() {
 
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { sidebarOpen, setSidebarOpen } = useSidebar();
-
-  const logoutHandler = () => {
-    logout();
-  }
 
   const toggleSidebar = React.useCallback(() => {
     setSidebarOpen(!sidebarOpen);
@@ -31,10 +26,6 @@ export default function TopAppBar() {
         }
         <Typography variant="h6" component="div"> WZ Calendar </Typography>
         <Box sx={{ flexGrow: 1 }} />
-        { isAuthenticated() ?  
-          <Button color="inherit" onClick={logoutHandler}>Logout</Button>
-          : null
-        }
       </Toolbar>
     </AppBar>
   );

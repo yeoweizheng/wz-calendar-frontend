@@ -168,7 +168,7 @@ export default function WeeklyCalendar() {
       <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
-        autoHideDuration={3000}>
+        autoHideDuration={1000}>
           <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
             {snackbarMessage}
           </Alert>

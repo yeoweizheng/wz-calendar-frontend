@@ -11,11 +11,13 @@ import LabelIcon from '@mui/icons-material/Label';
 import LabelOffIcon from '@mui/icons-material/LabelOff';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import EditIcon from '@mui/icons-material/Edit';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Divider from '@mui/material/Divider';
 import { useHttp } from '../services/http';
 import TagModal from './TagModal';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { useAuth } from '../services/auth';
 
 
 export default function Sidebar(props) {
@@ -26,6 +28,7 @@ export default function Sidebar(props) {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false)
   const [snackbarMessage, setSnackbarMessage] = React.useState("")
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
+  const { logout } = useAuth();
 
   const isTagSelected = React.useCallback((tagId) => {
     return tagId === selectedTagId;
@@ -72,7 +75,7 @@ export default function Sidebar(props) {
       <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
         open={snackbarOpen}
         onClose={() => setSnackbarOpen(false)}
-        autoHideDuration={3000}>
+        autoHideDuration={1000}>
           <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
             {snackbarMessage}
           </Alert>
@@ -106,6 +109,13 @@ export default function Sidebar(props) {
               </ListItem>
               : null
             }
+          </List>
+          <Divider />
+          <List>
+            <ListItem button key="logout" onClick={() => {setSidebarOpen(false); logout();}}>
+              <ListItemIcon><LogoutIcon /></ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
           </List>
         </Box>
       </Drawer>

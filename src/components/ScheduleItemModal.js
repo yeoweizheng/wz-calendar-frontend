@@ -35,8 +35,8 @@ export default function ScheduleItemModal(props) {
   const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
 
   const handleDelete = React.useCallback(() => {
-    del(patchUrl, () => props.handleClose("Deleted " + name + " [" + date.format("D-MMM-YY ddd") + "]", "error"));
-  }, [props, date, name, del, patchUrl])
+    del(patchUrl, () => props.handleClose("Deleted " + name, "error"));
+  }, [props, name, del, patchUrl])
 
   const handleSave = React.useCallback(() => {
     if (name === "" || name === undefined || name === null) {
@@ -51,9 +51,9 @@ export default function ScheduleItemModal(props) {
       "tag": tagId
     }
     if (props.type === "edit") {
-      patch(patchUrl, payload, (data) => props.handleClose("Updated " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
+      patch(patchUrl, payload, (data) => props.handleClose("Updated " + data.name, "success"));
     } else {
-      post(baseUrl, payload, (data) => props.handleClose("Created " + data.name + " [" + moment(data.date, "YYYY-MM-DD").format("D-MMM-YY ddd") + "]", "success"));
+      post(baseUrl, payload, (data) => props.handleClose("Created " + data.name, "success"));
     }
   }, [name, post, patch, props, baseUrl, patchUrl, date, done, selectedTagId])
 
@@ -63,8 +63,8 @@ export default function ScheduleItemModal(props) {
   }, []);
 
   const handleKeyUp = React.useCallback((e) => {
-    if (e.keyCode === 13) handleSave();
-  }, [handleSave])
+    if (e.keyCode === 13 && props.open) handleSave();
+  }, [handleSave, props.open])
 
   const handleSelectedTagId = React.useCallback((e) => {
     setSelectedTagId(e.target.value);
