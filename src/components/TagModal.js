@@ -59,14 +59,10 @@ export default function TagModal(props) {
   }, [name, post, patch, props, baseUrl, selectedTagId])
   
   const handleKeyUp = React.useCallback((e) => {
-    if (props.open) {
-      if (e.keyCode === 13) {
-        handleSave();
-      } else if (e.keyCode === 4) {
-        props.handleClose();
-      }
+    if (props.open && e.keyCode === 13) {
+      handleSave();
     }
-  }, [handleSave, props])
+  }, [handleSave, props.open])
 
   const handleSelectedTagId = React.useCallback((e) => {
     setSelectedTagId(e.target.value);
