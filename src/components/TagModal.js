@@ -18,7 +18,6 @@ import Typography from '@mui/material/Typography';
 
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
-  const [nameInput, setNameInput] = React.useState();
   const [nameError, setNameError] = React.useState(false);
   const {tags, tagModalOpen} = useSidebar();
   const [selectedTagId, setSelectedTagId] = React.useState("");
@@ -72,8 +71,7 @@ export default function TagModal(props) {
     setName("");
     setNameError(false);
     setSelectedTagId("")
-    if (nameInput && props.type === "create") nameInput.focus();
-  }, [tagModalOpen, setSelectedTagId, tags, nameInput, props.type, props.open])
+  }, [tagModalOpen])
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -120,7 +118,6 @@ export default function TagModal(props) {
           onChange={(e) => handleNameChange(e)}
           required
           error={nameError}
-          inputRef={el => { setNameInput(el) }}
         />
       </DialogContent>
       <DialogActions sx={{ pl: 2, pr: 2 }}>
