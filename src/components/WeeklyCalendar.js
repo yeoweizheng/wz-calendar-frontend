@@ -6,7 +6,6 @@ import Chip from '@mui/material/Chip';
 import TextField from '@mui/material/TextField';
 import { useCalendar } from '../services/calendar';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
-import moment from 'moment';
 import Stack from '@mui/material/Stack';
 import { useHttp } from '../services/http';
 import { useSwipeable } from 'react-swipeable';
@@ -22,12 +21,13 @@ import Button from '@mui/material/Button';
 import { useSidebar } from '../services/sidebar';
 import Sidebar from './Sidebar';
 import { useCustomDay } from '../services/customday';
+import { add, sub, format, isSameDay, isSameWeek } from 'date-fns';
 
 export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
-  const today = moment();
+  const today = new Date();
   const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
   const [selectedDate, setSelectedDate] = React.useState(today);
@@ -48,12 +48,12 @@ export default function WeeklyCalendar() {
   }, [setSelectedDate, setCustomDayValue])
 
   const gotoNextWeek = React.useCallback(() => {
-    const newDate = selectedDate.clone().add(7, "days");
+    const newDate = add(selectedDate, {"weeks": 1})
     setSelectedDateForAll(newDate);
   }, [setSelectedDateForAll, selectedDate])
 
   const gotoPrevWeek = React.useCallback(() => {
-    const newDate = selectedDate.clone().subtract(7, "days");
+    const newDate = sub(selectedDate, {"weeks": 1})
     setSelectedDateForAll(newDate);
   }, [setSelectedDateForAll, selectedDate])
 
@@ -81,7 +81,7 @@ export default function WeeklyCalendar() {
 
   const getScheduleItemsForDate = React.useCallback((scheduleItems, dateObj) => {
     let items = [];
-    const searchDate = dateObj.format('YYYY-MM-DD');
+    const searchDate = format(dateObj, 'yyyy-MM-dd')
     for (let item of scheduleItems) {
       if (item.date === searchDate) items.push(item);
     }
@@ -110,7 +110,7 @@ export default function WeeklyCalendar() {
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     setLoading(true);
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
-    let url = 'schedule_items/?start_date=' + startDateObj.format('YYYY-MM-DD') + '&end_date=' +endDateObj.format('YYYY-MM-DD');
+    let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
     if (selectedTagId !== "a") {
       url += "&tag=" + selectedTagId
     }
@@ -152,7 +152,7 @@ export default function WeeklyCalendar() {
       return text;
     }
   }, [])
-  
+
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
   }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
@@ -184,9 +184,8 @@ export default function WeeklyCalendar() {
             onOpen={() => setDatePickerOpen(true)}
             onClose={() => setDatePickerOpen(false)}
             renderDay={renderWeekPickerDay}
+            inputFormat="'Week 'w' of 'yyyy"
             renderInput={(params) => {
-              const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
-              params['inputProps']['value'] = startDateObj.format('D MMM YY') + ' - ' + endDateObj.format('D MMM YY');
               return <TextField size="small" sx={{ mt: 2 }} {...params} />}
             }
             keepMounted
@@ -197,13 +196,13 @@ export default function WeeklyCalendar() {
       <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
-            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
+            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
-                <Typography variant="body2" component="p" align="center">{data.date.format('D MMM')}</Typography>
+                <Typography variant="body2" component="p" align="center">{format(data.date, "d MMM")}</Typography>
                 <Typography variant="body2" component="p" align="center">{data.day}</Typography>
               </Box>
             </Grid>
-            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
+            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
@@ -212,7 +211,7 @@ export default function WeeklyCalendar() {
                 ))}
               </Box>
             </Grid>
-            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300", backgroundColor: data.date.isSame(today, "day")? "LightYellow":"White" }}>
+            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
               <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
                 <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
               </Box>
@@ -220,7 +219,7 @@ export default function WeeklyCalendar() {
           </React.Fragment>
         ))}
       </Grid>
-      { selectedDate.clone().startOf("week").isSame(today.clone().startOf("week"), "day") ? null :
+      { isSameWeek(selectedDate, today) ? null :
         <Stack alignItems="center">
           <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today)}>Current week</Button>
         </Stack>

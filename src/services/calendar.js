@@ -1,18 +1,18 @@
 import * as React from 'react';
-import moment from 'moment';
+import { startOfWeek, endOfWeek, add } from 'date-fns';
 
 export function useCalendar() {
   const getDateObjInWeek = React.useCallback((selectedDate) => {
     let dates = [];
     let currentDate;
     if (selectedDate == null) {
-      currentDate = moment().startOf("week");
+      currentDate = startOfWeek(new Date());
     } else {
-      currentDate = selectedDate.clone().startOf("week");
+      currentDate = startOfWeek(selectedDate);
     }
     for (let i = 0; i < 7; i++) {
-      dates.push(currentDate.clone());
-      currentDate.add(1, "days");
+      currentDate = add(currentDate, {"days": 1})
+      dates.push(currentDate);
     }
     return dates
   }, [])
@@ -20,8 +20,8 @@ export function useCalendar() {
     return ["LD", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   }, [])
   const getStartEndDateObj = React.useCallback((selectedDate) => {
-    let startDateObj = selectedDate.clone().startOf("week");
-    let endDateObj = selectedDate.clone().endOf("week");
+    let startDateObj = startOfWeek(selectedDate);
+    let endDateObj = endOfWeek(selectedDate);
     return [startDateObj, endDateObj];
   }, []);
   return { getDateObjInWeek, getDaysInWeek, getStartEndDateObj }

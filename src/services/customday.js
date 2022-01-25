@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import PickersDay from '@mui/lab/PickersDay';
-import moment from 'moment';
 import { useCalendar } from './calendar';
+import { isWithinInterval, isSameDay } from 'date-fns';
 
 export function useCustomDay() {
-  const [customDayValue, setCustomDayValue] = React.useState(moment());
+  const [customDayValue, setCustomDayValue] = React.useState(new Date());
   const { getStartEndDateObj } = useCalendar();
   const CustomPickersDay = styled(PickersDay, {
     shouldForwardProp: (prop) =>
@@ -34,9 +34,9 @@ export function useCustomDay() {
       return <PickersDay {...pickersDayProps} />;
     }
     const [start, end] = getStartEndDateObj(customDayValue);
-    const dayIsBetween = date.isBetween(start, end, undefined, "[]");
-    const isFirstDay = date.isSame(start, "day");
-    const isLastDay = date.isSame(end, "day");
+    const dayIsBetween = isWithinInterval(date, { start, end });
+    const isFirstDay = isSameDay(date, start);
+    const isLastDay = isSameDay(date, end);
     return (
       <CustomPickersDay
         {...pickersDayProps}

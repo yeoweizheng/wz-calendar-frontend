@@ -8,7 +8,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
 import { useHttp } from '../services/http';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
-import moment from 'moment';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -20,11 +19,12 @@ import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import { format } from 'date-fns';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
   const [nameError, setNameError] = React.useState(false);
-  const [date, setDate] = React.useState(moment());
+  const [date, setDate] = React.useState(new Date());
   const [done, setDone] = React.useState(false);
   const {post, patch, del} = useHttp()
   const baseUrl = 'schedule_items/';
@@ -45,7 +45,7 @@ export default function ScheduleItemModal(props) {
     const tagId = selectedTagId === "u" ? null : selectedTagId;
     const payload = {
       "name": name,
-      "date": date.format("YYYY-MM-DD"),
+      "date": format(date, "yyyy-MM-dd"),
       "done": done,
       "tag": tagId
     }
@@ -80,7 +80,7 @@ export default function ScheduleItemModal(props) {
   React.useEffect(() => {
     setName(props.name);
     setNameError(false);
-    setDate(moment(props.date, 'YYYY-MM-DD'));
+    setDate(props.date);
     setDone(props.done);
     const tag = props.tag === null ? "u": props.tag;
     setSelectedTagId(tag);
@@ -117,8 +117,8 @@ export default function ScheduleItemModal(props) {
           label="Select date"
           onChange={() => {}}
           onAccept={(value) => {setDate(value)}}
+          inputFormat="d MMM yy (E)"
           renderInput={(params) => {
-            params['inputProps']['value'] = date.format('D MMM YY (ddd)')
             return <TextField size="small" variant="standard" fullWidth {...params} />}
           }
           keepMounted
