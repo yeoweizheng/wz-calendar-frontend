@@ -8,7 +8,7 @@ import { AuthProvider } from './services/auth';
 import WeeklyCalendar from './components/WeeklyCalendar';
 import RequireAuth from './components/RequireAuth';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import AdapterMoment from '@mui/lab/AdapterMoment';
 import { SidebarProvider } from './services/sidebar';
 
 export default function App() {
@@ -24,7 +24,7 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <AuthProvider>
           <SidebarProvider>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <LocalizationProvider dateAdapter={AdapterMoment}>
               <TopAppBar />
               <Routes>
                 <Route path="login" element={<Login />} />
