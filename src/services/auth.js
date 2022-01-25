@@ -15,8 +15,8 @@ export const AuthProvider = (props) => {
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
   React.useEffect(() => {
-    setCookie('username', username, { path: '/'})
-    setCookie('token', token, { path: '/'})
+    setCookie('username', username, { path: '/', sameSite: "strict"})
+    setCookie('token', token, { path: '/', sameSite: "strict"})
   }, [username, token, setCookie]);
 
   const login = React.useCallback((username, password, successCallback, failureCallback) => {
