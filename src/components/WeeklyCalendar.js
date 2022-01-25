@@ -21,7 +21,7 @@ import Button from '@mui/material/Button';
 import { useSidebar } from '../services/sidebar';
 import Sidebar from './Sidebar';
 import { useCustomDay } from '../services/customday';
-import { add, sub, format, isSameDay, isSameWeek } from 'date-fns';
+import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
 
 export default function WeeklyCalendar() {
 
@@ -128,6 +128,7 @@ export default function WeeklyCalendar() {
         if (id === item.id) {
           let modalItem = {...item};
           modalItem["type"] = "edit";
+          modalItem["date"] = parse(item["date"], "yyyy-MM-dd", new Date());
           setModalItem(modalItem);
         }
       }

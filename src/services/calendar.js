@@ -11,8 +11,8 @@ export function useCalendar() {
       currentDate = startOfWeek(selectedDate);
     }
     for (let i = 0; i < 7; i++) {
-      currentDate = add(currentDate, {"days": 1})
       dates.push(currentDate);
+      currentDate = add(currentDate, {"days": 1})
     }
     return dates
   }, [])
