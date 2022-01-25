@@ -80,7 +80,7 @@ export default function Sidebar(props) {
             {snackbarMessage}
           </Alert>
       </Snackbar>
-      <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+      <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)} ModalProps={{keepMounted: true}}>
         <Box sx={{ width: 250 }}>
           <List>
             {tags.map((tag) => (
