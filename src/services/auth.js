@@ -3,6 +3,7 @@ import axios from "axios";
 import { API_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useCookies } from 'react-cookie';
+import { add } from 'date-fns';
 
 const AuthContext = React.createContext({});
 
@@ -15,8 +16,8 @@ export const AuthProvider = (props) => {
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
   React.useEffect(() => {
-    setCookie('username', username, { path: '/', sameSite: "strict"})
-    setCookie('token', token, { path: '/', sameSite: "strict"})
+    setCookie('username', username, { path: '/', sameSite: "strict", expires: add(new Date(), {"years": 1})})
+    setCookie('token', token, { path: '/', sameSite: "strict", expires: add(new Date(), {"years": 1})})
   }, [username, token, setCookie]);
 
   const login = React.useCallback((username, password, successCallback, failureCallback) => {
