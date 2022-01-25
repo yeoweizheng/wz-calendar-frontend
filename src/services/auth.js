@@ -2,20 +2,22 @@ import * as React from 'react';
 import axios from "axios";
 import { API_URL } from "../config";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useCookies } from 'react-cookie';
 
 const AuthContext = React.createContext({});
 
 export const AuthProvider = (props) => {
-  const [username, setUsername] = React.useState(localStorage.getItem("username"));
-  const [token, setToken] = React.useState(localStorage.getItem("token"));
+  const [cookies, setCookie] = useCookies(['username', 'token'])
+  const [username, setUsername] = React.useState(cookies.username);
+  const [token, setToken] = React.useState(cookies.token);
   const navigate = useNavigate();
   const location = useLocation();
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
   React.useEffect(() => {
-    localStorage.setItem("username", username);
-    localStorage.setItem("token", token);
-  }, [username, token]);
+    setCookie('username', username, { path: '/'})
+    setCookie('token', token, { path: '/'})
+  }, [username, token, setCookie]);
 
   const login = React.useCallback((username, password, successCallback, failureCallback) => {
     return axios.post(API_URL + "token/", { username, password }).then(res => {
