@@ -18,7 +18,7 @@ import Box from '@mui/material/Box';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 import Sidebar from './Sidebar';
 import { useCustomDay } from '../services/customday';
 import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
@@ -27,7 +27,7 @@ export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
-  const {selectedTagId, tagModalOpen, selectedDate, setSelectedDate, today} = useSidebar();
+  const {selectedTagId, tagModalOpen, selectedDate, setSelectedDate, today} = useGlobalData();
   const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);

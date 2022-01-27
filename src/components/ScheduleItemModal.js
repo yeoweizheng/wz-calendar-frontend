@@ -11,7 +11,7 @@ import MobileDatePicker from '@mui/lab/MobileDatePicker';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -29,7 +29,7 @@ export default function ScheduleItemModal(props) {
   const {post, patch, del} = useHttp()
   const baseUrl = 'schedule_items/';
   const patchUrl = baseUrl + props.id + '/';
-  const { tags } = useSidebar();
+  const { tags } = useGlobalData();
   const [ selectedTagId, setSelectedTagId ] = React.useState("u");
   const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
 

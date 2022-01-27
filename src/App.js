@@ -9,7 +9,7 @@ import WeeklyCalendar from './components/WeeklyCalendar';
 import RequireAuth from './components/RequireAuth';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import { SidebarProvider } from './services/sidebar';
+import { GlobalDataProvider } from './services/globalData';
 
 export default function App() {
   const theme = createTheme({
@@ -24,13 +24,13 @@ export default function App() {
       <ThemeProvider theme={theme}>
         <AuthProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <SidebarProvider>
+            <GlobalDataProvider>
               <TopAppBar />
               <Routes>
                 <Route path="login" element={<Login />} />
                 <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
               </Routes>
-            </SidebarProvider>
+            </GlobalDataProvider>
           </LocalizationProvider>
         </AuthProvider>
       </ThemeProvider>

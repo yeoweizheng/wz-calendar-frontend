@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Box from '@mui/material/Box';
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import LabelIcon from '@mui/icons-material/Label';
 import LabelOffIcon from '@mui/icons-material/LabelOff';
@@ -23,9 +23,8 @@ import SearchModal from './SearchModal';
 
 
 export default function Sidebar(props) {
-  const { defaultTags, sidebarOpen, setSidebarOpen, tags, setTags, selectedTagId, setSelectedTagId } = useSidebar();
+  const { defaultTags, sidebarOpen, setSidebarOpen, tags, setTags, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen } = useGlobalData();
   const { get } = useHttp();
-  const {tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen} = useSidebar();
   const [tagModalType, setTagModalType] = React.useState("create");
   const [snackbarOpen, setSnackbarOpen] = React.useState(false)
   const [snackbarMessage, setSnackbarMessage] = React.useState("")

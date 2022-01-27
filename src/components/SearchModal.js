@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import { useHttp } from '../services/http';
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 import Stack from '@mui/material/Stack';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -17,7 +17,7 @@ export default function SearchModal(props) {
   const { get } = useHttp();
   const [searchItems, setSearchItems] = React.useState([]);
   const [searchStr, setSearchStr] = React.useState("");
-  const {setSelectedDate, setSearchModalOpen} = useSidebar();
+  const {setSelectedDate, setSearchModalOpen} = useGlobalData();
 
   const handleRetrieveSearchItems = React.useCallback((data, searchStr) => {
     if (searchStr !== "") {

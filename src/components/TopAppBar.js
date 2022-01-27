@@ -6,12 +6,12 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from "../services/auth";
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 
 export default function TopAppBar() {
 
   const { isAuthenticated } = useAuth();
-  const { sidebarOpen, setSidebarOpen } = useSidebar();
+  const { sidebarOpen, setSidebarOpen } = useGlobalData();
 
   const toggleSidebar = React.useCallback(() => {
     setSidebarOpen(!sidebarOpen);

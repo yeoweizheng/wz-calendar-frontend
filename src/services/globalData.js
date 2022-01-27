@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-const SidebarContext = React.createContext({});
+const GlobalDataContext = React.createContext({});
 
-export const SidebarProvider = (props) => {
+export const GlobalDataProvider = (props) => {
   const defaultTags = React.useMemo(() => ([{"id": "a", "name": "All tags"}, {"id": "u", "name": "Untagged"}]), [])
   const [tags, setTags] = React.useState(defaultTags);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -12,18 +12,18 @@ export const SidebarProvider = (props) => {
   const today = React.useMemo(() => (new Date()), []);
   const [selectedDate, setSelectedDate] = React.useState(today);
 
-  const sidebarMemo = React.useMemo(
+  const globalDataMemo = React.useMemo(
     () => ({ defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today }),
     [defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today]
   );
 
   return (
-    <SidebarContext.Provider value={sidebarMemo}>
+    <GlobalDataContext.Provider value={globalDataMemo}>
       {props.children}
-    </SidebarContext.Provider>
+    </GlobalDataContext.Provider>
   )
 }
 
-export const useSidebar = () => {
-  return React.useContext(SidebarContext);
+export const useGlobalData = () => {
+  return React.useContext(GlobalDataContext);
 }

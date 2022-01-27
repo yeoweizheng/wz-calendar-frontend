@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
 import { useHttp } from '../services/http';
-import { useSidebar } from '../services/sidebar';
+import { useGlobalData } from '../services/globalData';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
-  const {tags, tagModalOpen} = useSidebar();
+  const {tags, tagModalOpen} = useGlobalData();
   const [selectedTagId, setSelectedTagId] = React.useState("");
   const [tagMenuOpen, setTagMenuOpen] = React.useState(false);
   const {post, patch, del} = useHttp()
