@@ -35,16 +35,16 @@ export default function SearchModal(props) {
   }, [get, handleRetrieveSearchItems, setSearchStr])
 
   const handleSearchItemClick = React.useCallback((item) => {
+    setSearchModalOpen(false);
     setSearchStr("");
     setSearchItems([]);
-    setSearchModalOpen(false);
     setSelectedDate(parse(item.date, "yyyy-MM-dd", new Date()));
   }, [setSearchModalOpen, setSelectedDate, setSearchStr, setSearchItems])
 
   const handleClose = React.useCallback(() => {
+    setSearchModalOpen(false);
     setSearchStr("");
     setSearchItems([]);
-    setSearchModalOpen(false);
   }, [setSearchStr, setSearchModalOpen])
 
   return (
