@@ -12,18 +12,20 @@ import LabelOffIcon from '@mui/icons-material/LabelOff';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
+import SearchIcon from '@mui/icons-material/Search';
 import Divider from '@mui/material/Divider';
 import { useHttp } from '../services/http';
 import TagModal from './TagModal';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { useAuth } from '../services/auth';
+import SearchModal from './SearchModal';
 
 
 export default function Sidebar(props) {
   const { defaultTags, sidebarOpen, setSidebarOpen, tags, setTags, selectedTagId, setSelectedTagId } = useSidebar();
   const { get } = useHttp();
-  const {tagModalOpen, setTagModalOpen} = useSidebar();
+  const {tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen} = useSidebar();
   const [tagModalType, setTagModalType] = React.useState("create");
   const [snackbarOpen, setSnackbarOpen] = React.useState(false)
   const [snackbarMessage, setSnackbarMessage] = React.useState("")
@@ -57,6 +59,11 @@ export default function Sidebar(props) {
     setTagModalOpen(true);
   }, [setSidebarOpen, setTagModalType, setTagModalOpen])
 
+  const openSearchModal = React.useCallback(() => {
+    setSidebarOpen(false);
+    setSearchModalOpen(true);
+  }, [setSidebarOpen, setSearchModalOpen])
+
   const handleTagModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
       setSnackbarOpen(true);
@@ -82,6 +89,13 @@ export default function Sidebar(props) {
       </Snackbar>
       <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)} ModalProps={{keepMounted: true}}>
         <Box sx={{ width: 250 }}>
+          <List>
+            <ListItem button key="search" onClick={() => openSearchModal()}>
+              <ListItemIcon><SearchIcon /></ListItemIcon>
+              <ListItemText primary="Search" />
+            </ListItem>
+          </List>
+          <Divider />
           <List>
             {tags.map((tag) => (
               <ListItem button key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
@@ -123,6 +137,9 @@ export default function Sidebar(props) {
         open={tagModalOpen}
         type={tagModalType}
         handleClose={(alertMsg, severity) => handleTagModalClose(alertMsg, severity)}
+      />
+      <SearchModal
+        open={searchModalOpen}
       />
     </React.Fragment>
   )

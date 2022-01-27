@@ -23,15 +23,15 @@ export default function App() {
     <React.Fragment>
       <ThemeProvider theme={theme}>
         <AuthProvider>
-          <SidebarProvider>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <SidebarProvider>
               <TopAppBar />
               <Routes>
                 <Route path="login" element={<Login />} />
                 <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />
               </Routes>
-            </LocalizationProvider>
-          </SidebarProvider>
+            </SidebarProvider>
+          </LocalizationProvider>
         </AuthProvider>
       </ThemeProvider>
     </React.Fragment>

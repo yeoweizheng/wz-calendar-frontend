@@ -26,6 +26,7 @@ export default function TopAppBar() {
         }
         <Typography variant="h6" component="div"> WZ Calendar </Typography>
         <Box sx={{ flexGrow: 1 }} />
+        
       </Toolbar>
     </AppBar>
   );

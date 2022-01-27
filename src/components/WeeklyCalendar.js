@@ -27,10 +27,9 @@ export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
-  const today = new Date();
+  const {selectedTagId, tagModalOpen, selectedDate, setSelectedDate, today} = useSidebar();
   const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
-  const [selectedDate, setSelectedDate] = React.useState(today);
   const [modalOpen, setModalOpen] = React.useState(false);
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
@@ -38,7 +37,6 @@ export default function WeeklyCalendar() {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false)
   const [snackbarMessage, setSnackbarMessage] = React.useState("")
   const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
-  const {selectedTagId, tagModalOpen} = useSidebar();
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
 
