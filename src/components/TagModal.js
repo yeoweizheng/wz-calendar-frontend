@@ -82,7 +82,7 @@ export default function TagModal(props) {
 
   return (
     <Dialog open={props.open ? props.open : false} onClose={() => props.handleClose()} fullWidth keepMounted>
-      <DialogTitle>
+      <DialogTitle sx={{pt: 1, pb: 1}}>
         <Box sx={{display: "flex"}}>
           <Box sx={{ flexGrow: 1}}>
             <Typography variant="h6" component="h6" sx={{mt: 0.5}}>
@@ -94,11 +94,13 @@ export default function TagModal(props) {
           </Box>
         </Box>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{pb: 0}}>
         {props.type === "create" ? null :
-            <FormControl fullWidth>
-              <InputLabel size="small">Tag</InputLabel>
+            <FormControl fullWidth sx={{mt: 1}}>
+              <InputLabel size="small" id="tag-modal-input-label">Tag</InputLabel>
               <Select size="small" 
+                labelId="tag-modal-input-label"
+                label="Tag"
                 open={tagMenuOpen}
                 value={selectedTagId} 
                 onChange={(e) => handleSelectedTagId(e)}
@@ -115,8 +117,9 @@ export default function TagModal(props) {
         <TextField
           label="Name"
           value={name}
+          size="small"
           fullWidth
-          variant="standard"
+          sx={{mt: 1}}
           onChange={(e) => handleNameChange(e)}
           required
           error={nameError}

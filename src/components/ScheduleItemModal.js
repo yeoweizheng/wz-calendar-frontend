@@ -19,6 +19,7 @@ import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 import { format } from 'date-fns';
 
 export default function ScheduleItemModal(props) {
@@ -88,7 +89,7 @@ export default function ScheduleItemModal(props) {
 
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
-      <DialogTitle>
+      <DialogTitle sx={{pt: 1, pb: 1}}>
         <Box sx={{display: "flex"}}>
           <Box sx={{ flexGrow: 1}}>
             <Typography variant="h6" component="h6" sx={{mt: 0.5}}>
@@ -100,54 +101,54 @@ export default function ScheduleItemModal(props) {
           </Box>
         </Box>
       </DialogTitle>
-      <DialogContent>
-        <TextField
-          label="Name"
-          value={name}
-          fullWidth
-          variant="standard"
-          onChange={(e) => handleNameChange(e)}
-          required
-          error={nameError}
-        />
-      </DialogContent>
-      <DialogContent sx={{pt: 0}}>
-        <MobileDatePicker
-          value={date}
-          label="Select date"
-          onChange={() => {}}
-          onAccept={(value) => {setDate(value)}}
-          inputFormat="d MMM yy (E)"
-          renderInput={(params) => {
-            return <TextField size="small" variant="standard" fullWidth {...params} />}
+      <DialogContent sx={{pb: 0}}>
+        <Stack spacing={1}>
+          <TextField
+            label="Name"
+            value={name}
+            size="small"
+            sx={{mt: 1}}
+            fullWidth
+            onChange={(e) => handleNameChange(e)}
+            required
+            error={nameError}
+          />
+          <MobileDatePicker
+            value={date}
+            label="Select date"
+            onChange={() => {}}
+            onAccept={(value) => {setDate(value)}}
+            inputFormat="d MMM yy (E)"
+            renderInput={(params) => {
+              return <TextField size="small" fullWidth {...params} />}
+            }
+            keepMounted
+          />
+          <FormControl fullWidth>
+            <InputLabel size="small" id="tag-input-label">Tag</InputLabel>
+            <Select size="small" 
+              labelId="tag-input-label"
+              label="Tag"
+              open={tagMenuOpen}
+              value={selectedTagId} 
+              onChange={(e) => handleSelectedTagId(e)}
+              onOpen={() => setTagMenuOpen(true)}
+              onClose={() => setTagMenuOpen(false)}
+              >
+              {tags.map((tag) => (
+                tag.id !== "a"?
+                <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
+              ))}
+            </Select>
+          </FormControl>
+          { props.type === "edit" ?
+            <FormGroup sx={{mt: 0}}>
+              <FormControlLabel control={<Checkbox sx={{pt: 0, pb: 0}} checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />
+            </FormGroup>
+            : null
           }
-          keepMounted
-        />
+        </Stack>
       </DialogContent>
-      <DialogContent sx={{pt: 0}}>
-        <FormControl fullWidth>
-          <InputLabel size="small">Tag</InputLabel>
-          <Select size="small" 
-            open={tagMenuOpen}
-            value={selectedTagId} 
-            onChange={(e) => handleSelectedTagId(e)}
-            onOpen={() => setTagMenuOpen(true)}
-            onClose={() => setTagMenuOpen(false)}
-            >
-            {tags.map((tag) => (
-              tag.id !== "a"?
-              <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      { props.type === "edit" ?
-        <DialogContent sx={{pt: 0}}>
-          <FormGroup>
-            <FormControlLabel control={<Checkbox checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />
-          </FormGroup>
-        </DialogContent> : null
-      }
       <DialogActions sx={{ pl: 2, pr: 2 }}>
         { props.type === "edit" ?
           <Button onClick={handleDelete} color="error">Delete</Button> : null
