@@ -143,8 +143,8 @@ export default function ScheduleItemModal(props) {
             </Select>
           </FormControl>
           { props.type === "edit" ?
-            <FormGroup sx={{mt: 0}}>
-              <FormControlLabel control={<Checkbox sx={{pt: 0, pb: 0}} checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />
+            <FormGroup>
+              <FormControlLabel sx={{mt: 0.5, mb: 0.5}} control={<Checkbox sx={{pt: 0, pb: 0}} checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />
             </FormGroup>
             : null
           }
