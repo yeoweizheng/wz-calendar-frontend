@@ -107,9 +107,9 @@ export default function ScheduleItemModal(props) {
             label="Name"
             value={name}
             size="small"
-            sx={{mt: 1}}
             fullWidth
             onChange={(e) => handleNameChange(e)}
+            variant="standard"
             required
             error={nameError}
           />
@@ -120,15 +120,16 @@ export default function ScheduleItemModal(props) {
             onAccept={(value) => {setDate(value)}}
             inputFormat="d MMM yy (E)"
             renderInput={(params) => {
-              return <TextField size="small" fullWidth {...params} />}
+              return <TextField size="small" variant="standard" fullWidth {...params} />}
             }
             keepMounted
           />
           <FormControl fullWidth>
-            <InputLabel size="small" id="tag-input-label">Tag</InputLabel>
+            <InputLabel size="small" variant="standard" id="tag-input-label">Tag</InputLabel>
             <Select size="small" 
               labelId="tag-input-label"
               label="Tag"
+              variant="standard"
               open={tagMenuOpen}
               value={selectedTagId} 
               onChange={(e) => handleSelectedTagId(e)}

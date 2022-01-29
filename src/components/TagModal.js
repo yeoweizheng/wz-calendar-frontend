@@ -15,6 +15,7 @@ import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
@@ -95,35 +96,38 @@ export default function TagModal(props) {
         </Box>
       </DialogTitle>
       <DialogContent sx={{pb: 0}}>
-        {props.type === "create" ? null :
-            <FormControl fullWidth sx={{mt: 1}}>
-              <InputLabel size="small" id="tag-modal-input-label">Tag</InputLabel>
-              <Select size="small" 
-                labelId="tag-modal-input-label"
-                label="Tag"
-                open={tagMenuOpen}
-                value={selectedTagId} 
-                onChange={(e) => handleSelectedTagId(e)}
-                onOpen={() => setTagMenuOpen(true)}
-                onClose={() => setTagMenuOpen(false)}
-                >
-                {tags.map((tag) => (
-                  tag.id !== "a" && tag.id !== "u"?
-                  <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
-                ))}
-              </Select>
-            </FormControl>
-        }
-        <TextField
-          label="Name"
-          value={name}
-          size="small"
-          fullWidth
-          sx={{mt: 1}}
-          onChange={(e) => handleNameChange(e)}
-          required
-          error={nameError}
-        />
+        <Stack spacing={1}>
+          {props.type === "create" ? null :
+              <FormControl fullWidth>
+                <InputLabel size="small" variant="standard" id="tag-modal-input-label">Tag</InputLabel>
+                <Select size="small" 
+                  labelId="tag-modal-input-label"
+                  label="Tag"
+                  variant="standard"
+                  open={tagMenuOpen}
+                  value={selectedTagId} 
+                  onChange={(e) => handleSelectedTagId(e)}
+                  onOpen={() => setTagMenuOpen(true)}
+                  onClose={() => setTagMenuOpen(false)}
+                  >
+                  {tags.map((tag) => (
+                    tag.id !== "a" && tag.id !== "u"?
+                    <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
+                  ))}
+                </Select>
+              </FormControl>
+          }
+          <TextField
+            label="Name"
+            value={name}
+            size="small"
+            variant="standard"
+            fullWidth
+            onChange={(e) => handleNameChange(e)}
+            required
+            error={nameError}
+          />
+        </Stack>
       </DialogContent>
       <DialogActions sx={{ pl: 2, pr: 2 }}>
         { props.type === "edit" ?
