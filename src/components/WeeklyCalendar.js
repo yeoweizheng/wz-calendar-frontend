@@ -197,15 +197,15 @@ export default function WeeklyCalendar() {
           <React.Fragment key={data.date}>
             <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
-                <Typography variant="body2" component="p" align="center">{format(data.date, "d MMM")}</Typography>
-                <Typography variant="body2" component="p" align="center">{data.day}</Typography>
+                <Typography variant="body2" component="p" align="center" fontWeight="medium">{format(data.date, "d MMM")}</Typography>
+                <Typography variant="body2" component="p" align="center" fontWeight="medium">{data.day}</Typography>
               </Box>
             </Grid>
             <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
-                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)}></Chip>
+                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
                   </React.Fragment>
                 ))}
               </Box>
