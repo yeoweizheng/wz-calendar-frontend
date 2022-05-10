@@ -205,7 +205,7 @@ export default function WeeklyCalendar() {
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
-                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "warning"} onClick={() => openModal(item.id)}></Chip>
+                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)}></Chip>
                   </React.Fragment>
                 ))}
               </Box>
