@@ -33,7 +33,6 @@ export default function ScheduleItemModal(props) {
   const { tags } = useGlobalData();
   const [ selectedTagId, setSelectedTagId ] = React.useState("u");
   const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
-  const [ datePickerOpen, setDatePickerOpen ] = React.useState(false);
 
   const handleDelete = React.useCallback(() => {
     del(patchUrl, () => props.handleClose("Deleted " + name, "error"));
@@ -63,21 +62,10 @@ export default function ScheduleItemModal(props) {
     setName(e.target.value);
   }, []);
 
-  const handleKeyUp = React.useCallback((e) => {
-    if (!datePickerOpen && !tagMenuOpen && props.open && e.keyCode === 13) {
-      handleSave();
-    }
-  }, [handleSave, props.open, datePickerOpen]);
-
   const handleSelectedTagId = React.useCallback((e) => {
     setSelectedTagId(e.target.value);
     setTagMenuOpen(false);
   }, [setSelectedTagId, setTagMenuOpen])
-
-  React.useEffect(() => {
-    window.document.addEventListener('keyup', handleKeyUp);
-    return () => { window.document.removeEventListener('keyup', handleKeyUp); }
-  }, [handleKeyUp]);
 
   React.useEffect(() => {
     setName(props.name);
@@ -119,8 +107,6 @@ export default function ScheduleItemModal(props) {
             label="Select date"
             onChange={() => {}}
             onAccept={(value) => {setDate(value)}}
-            onOpen={() => setDatePickerOpen(true)}
-            onClose={() => setDatePickerOpen(false)}
             inputFormat="d MMM yy (E)"
             renderInput={(params) => {
               return <TextField size="small" variant="standard" fullWidth {...params} />}

@@ -59,12 +59,6 @@ export default function TagModal(props) {
     }
   }, [name, post, patch, props, baseUrl, selectedTagId])
   
-  const handleKeyUp = React.useCallback((e) => {
-    if (!tagMenuOpen && props.open && e.keyCode === 13) {
-      handleSave();
-    }
-  }, [handleSave, props.open])
-
   const handleSelectedTagId = React.useCallback((e) => {
     setSelectedTagId(e.target.value);
     setTagMenuOpen(false);
@@ -75,11 +69,6 @@ export default function TagModal(props) {
     setNameError(false);
     setSelectedTagId("")
   }, [tagModalOpen])
-
-  React.useEffect(() => {
-    window.document.addEventListener('keyup', handleKeyUp);
-    return () => { window.document.removeEventListener('keyup', handleKeyUp); }
-  }, [handleKeyUp]);
 
   return (
     <Dialog open={props.open ? props.open : false} onClose={() => props.handleClose()} fullWidth keepMounted>
