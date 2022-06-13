@@ -64,7 +64,7 @@ export default function ScheduleItemModal(props) {
   }, []);
 
   const handleKeyUp = React.useCallback((e) => {
-    if (!datePickerOpen && props.open && e.keyCode === 13) {
+    if (!datePickerOpen && !tagMenuOpen && props.open && e.keyCode === 13) {
       handleSave();
     }
   }, [handleSave, props.open, datePickerOpen]);

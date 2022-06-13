@@ -60,7 +60,7 @@ export default function TagModal(props) {
   }, [name, post, patch, props, baseUrl, selectedTagId])
   
   const handleKeyUp = React.useCallback((e) => {
-    if (props.open && e.keyCode === 13) {
+    if (!tagMenuOpen && props.open && e.keyCode === 13) {
       handleSave();
     }
   }, [handleSave, props.open])
