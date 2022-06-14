@@ -152,6 +152,10 @@ export default function WeeklyCalendar() {
     }
   }, [])
 
+  const getSameDayStyle = React.useCallback((date) => {
+    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, today)? "LightYellow":"White"}
+  }, [today]);
+
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
   }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
@@ -173,8 +177,8 @@ export default function WeeklyCalendar() {
           </Alert>
       </Snackbar>
       <Stack alignItems="center">
-        <Stack direction="row">
-          <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
+        <Stack direction="row" sx={{pt: 2}}>
+          <IconButton color="primary" onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
           <MobileDatePicker
             value={selectedDate}
             label="Select week"
@@ -185,23 +189,23 @@ export default function WeeklyCalendar() {
             renderDay={renderWeekPickerDay}
             inputFormat="'Week 'w' of 'yyyy"
             renderInput={(params) => {
-              return <TextField size="small" sx={{ mt: 2 }} {...params} />}
+              return <TextField size="small" {...params} />}
             }
             keepMounted
           />
-          <IconButton color="primary" sx={{mt: 2}} onClick={() => gotoNextWeek()}><ArrowForwardIcon /></IconButton>
+          <IconButton color="primary" onClick={() => gotoNextWeek()}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
       <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
           <React.Fragment key={data.date}>
-            <Grid item xs={3} sm={3} md={3} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
+            <Grid item xs={3} sm={3} md={3} sx={getSameDayStyle(data.date)}>
               <Box sx={{ p: 1 }}>
                 <Typography variant="body2" component="p" align="center" fontWeight="medium">{format(data.date, "d MMM")}</Typography>
                 <Typography variant="body2" component="p" align="center" fontWeight="medium">{data.day}</Typography>
               </Box>
             </Grid>
-            <Grid item xs={8} sm={8} md={8} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
+            <Grid item xs={8} sm={8} md={8} sx={getSameDayStyle(data.date)}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
                   <React.Fragment key={item.id}>
@@ -210,7 +214,7 @@ export default function WeeklyCalendar() {
                 ))}
               </Box>
             </Grid>
-            <Grid item xs={1} sm={1} md={1} sx={{border: 1, borderColor: "grey.300", backgroundColor: isSameDay(data.date, today)? "LightYellow":"White" }}>
+            <Grid item xs={1} sm={1} md={1} sx={getSameDayStyle(data.date)}>
               <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
                 <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
               </Box>

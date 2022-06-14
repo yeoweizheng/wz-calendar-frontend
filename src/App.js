@@ -17,6 +17,31 @@ export default function App() {
       primary: {
         main: "#21257f"
       }
+    },
+    components: {
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            paddingTop: "8px",
+            paddingBottom: "8px",
+          }
+        }
+      },
+      MuiDialogContent: {
+        styleOverrides: {
+          root: {
+            paddingBottom: "0px"
+          }
+        }
+      },
+      MuiDialogActions: {
+        styleOverrides: {
+          root: {
+            paddingLeft: "16px",
+            paddingRight: "16px",
+          }
+        }
+      }
     }
   })
   return (

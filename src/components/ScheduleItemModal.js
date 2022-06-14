@@ -78,9 +78,9 @@ export default function ScheduleItemModal(props) {
 
   return (
     <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
-      <DialogTitle sx={{pt: 1, pb: 1}}>
-        <Box sx={{display: "flex"}}>
-          <Box sx={{ flexGrow: 1}}>
+      <DialogTitle>
+        <Box style={{"display": "flex"}}>
+          <Box className="spacer-box">
             <Typography variant="h6" component="h6" sx={{mt: 0.5}}>
               {props.type === "create" ? "Create Schedule Item" : "Edit Schedule Item"}
             </Typography>
@@ -90,7 +90,7 @@ export default function ScheduleItemModal(props) {
           </Box>
         </Box>
       </DialogTitle>
-      <DialogContent sx={{pb: 0}}>
+      <DialogContent>
         <Stack spacing={1}>
           <TextField
             label="Name"
@@ -139,11 +139,11 @@ export default function ScheduleItemModal(props) {
           }
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ pl: 2, pr: 2 }}>
+      <DialogActions>
         { props.type === "edit" ?
           <Button onClick={handleDelete} color="error">Delete</Button> : null
         }
-        <Box sx={{ flexGrow: 1}} />
+        <Box className="spacer-box" />
         <Button onClick={handleSave}>Save</Button>
       </DialogActions>
     </Dialog>

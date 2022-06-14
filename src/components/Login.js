@@ -40,13 +40,12 @@ export default function Login() {
         autoHideDuration={1000}>
           <Alert onClose={() => setLoginFailedAlertOpen(false)} severity="error">Login failed.</Alert>
       </Snackbar>
-      <Box
-        sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', }}>
+      <Box style={{"display": "flex", "flex-direction": "column", "align-items": "center"}}>
         <Typography component="h6" variant="h6" sx={{mt: 2}}>Login</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField size="small" margin="normal" required fullWidth id="username" label="Username" name="username" autoComplete="username" autoFocus />
           <TextField size="small" margin="normal" required fullWidth name="password" label="Password" type ="password" id="password" autoComplete="current-password" />
-          <Button type ="submit" fullWidth variant="contained" sx={{ mt: 2 }} > Login </Button>
+          <Button type ="submit" fullWidth variant="contained" sx={{mt: 2}}> Login </Button>
         </Box>
       </Box>
     </Container>

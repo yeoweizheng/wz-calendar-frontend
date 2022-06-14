@@ -87,7 +87,7 @@ export default function Sidebar(props) {
           </Alert>
       </Snackbar>
       <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)} ModalProps={{keepMounted: true}}>
-        <Box sx={{ width: 250 }}>
+        <Box style={{"width": "250px"}}>
           <List>
             <ListItem button key="search" onClick={() => openSearchModal()}>
               <ListItemIcon><SearchIcon /></ListItemIcon>
