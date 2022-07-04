@@ -15,13 +15,12 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useGlobalData } from '../services/globalData';
 import Sidebar from './Sidebar';
 import { useCustomDay } from '../services/customday';
 import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
+import { useSnackbar } from '../services/snackbar';
 
 export default function WeeklyCalendar() {
 
@@ -34,11 +33,9 @@ export default function WeeklyCalendar() {
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [loading, setLoading] = React.useState(true);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false)
-  const [snackbarMessage, setSnackbarMessage] = React.useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
+  const {openSnackbar} = useSnackbar();
 
   const setSelectedDateForAll = React.useCallback((date) => {
     setSelectedDate(date);
@@ -136,12 +133,10 @@ export default function WeeklyCalendar() {
 
   const handleModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
-      setSnackbarOpen(true);
-      setSnackbarMessage(alertMsg);
-      setSnackbarSeverity(severity);
+      openSnackbar(alertMsg, severity);
     }
     setModalOpen(false);
-  }, [setSnackbarOpen, setSnackbarMessage, setSnackbarSeverity])
+  }, [openSnackbar, setModalOpen])
 
   const truncateIfTooLong = React.useCallback((text) => {
     const max_length = 33;
@@ -168,14 +163,6 @@ export default function WeeklyCalendar() {
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
       <Sidebar />
-      <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
-        open={snackbarOpen}
-        onClose={() => setSnackbarOpen(false)}
-        autoHideDuration={1000}>
-          <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
-            {snackbarMessage}
-          </Alert>
-      </Snackbar>
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>

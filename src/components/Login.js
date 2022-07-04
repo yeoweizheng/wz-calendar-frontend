@@ -4,17 +4,16 @@ import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import { useAuth } from "../services/auth";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useSnackbar } from '../services/snackbar';
 
 export default function Login() {
 
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [loginFailedAlertOpen, setLoginFailedAlertOpen] = React.useState(false);
+  const { openSnackbar } = useSnackbar();
 
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
@@ -22,25 +21,15 @@ export default function Login() {
     navigate(fromUrl, { replace: true });
   }
 
-  const handleFailure = () => {
-    setLoginFailedAlertOpen(true);
-  }
-
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    login(data.get("username"), data.get("password"), handleSuccess, handleFailure);
+    login(data.get("username"), data.get("password"), handleSuccess, () => {openSnackbar("Login failed.", "error")});
   }
 
   return (
     <Container maxWidth="xs">
-      <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
-        open={loginFailedAlertOpen}
-        onClose={() => setLoginFailedAlertOpen(false)}
-        autoHideDuration={1000}>
-          <Alert onClose={() => setLoginFailedAlertOpen(false)} severity="error">Login failed.</Alert>
-      </Snackbar>
-      <Box style={{"display": "flex", "flex-direction": "column", "align-items": "center"}}>
+      <Box style={{"display": "flex", "flexDirection": "column", "alignItems": "center"}}>
         <Typography component="h6" variant="h6" sx={{mt: 2}}>Login</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField size="small" margin="normal" required fullWidth id="username" label="Username" name="username" autoComplete="username" autoFocus />

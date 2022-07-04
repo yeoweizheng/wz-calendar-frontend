@@ -10,6 +10,7 @@ import RequireAuth from './components/RequireAuth';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { GlobalDataProvider } from './services/globalData';
+import AlertSnackbar from './components/AlertSnackbar';
 
 export default function App() {
   const theme = createTheme({
@@ -44,6 +45,7 @@ export default function App() {
       }
     }
   })
+
   return (
     <React.Fragment>
       <ThemeProvider theme={theme}>
@@ -51,6 +53,7 @@ export default function App() {
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <GlobalDataProvider>
               <TopAppBar />
+              <AlertSnackbar />
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/" element={<RequireAuth><WeeklyCalendar /></RequireAuth>} />

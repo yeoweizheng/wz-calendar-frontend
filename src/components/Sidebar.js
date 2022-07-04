@@ -16,19 +16,16 @@ import SearchIcon from '@mui/icons-material/Search';
 import Divider from '@mui/material/Divider';
 import { useHttp } from '../services/http';
 import TagModal from './TagModal';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
 import { useAuth } from '../services/auth';
 import SearchModal from './SearchModal';
+import { useSnackbar } from '../services/snackbar';
 
 
 export default function Sidebar(props) {
   const { defaultTags, sidebarOpen, setSidebarOpen, tags, setTags, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen } = useGlobalData();
   const { get } = useHttp();
   const [tagModalType, setTagModalType] = React.useState("create");
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false)
-  const [snackbarMessage, setSnackbarMessage] = React.useState("")
-  const [snackbarSeverity, setSnackbarSeverity] = React.useState("success")
+  const {openSnackbar} = useSnackbar();
   const { logout } = useAuth();
 
   const isTagSelected = React.useCallback((tagId) => {
@@ -65,12 +62,10 @@ export default function Sidebar(props) {
 
   const handleTagModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
-      setSnackbarOpen(true);
-      setSnackbarMessage(alertMsg);
-      setSnackbarSeverity(severity);
+      openSnackbar(alertMsg, severity);
     }
     setTagModalOpen(false);
-  }, [setSnackbarOpen, setSnackbarMessage, setSnackbarSeverity, setTagModalOpen])
+  }, [openSnackbar, setTagModalOpen])
 
   React.useEffect(() => {
     retrieveTags();
@@ -78,14 +73,6 @@ export default function Sidebar(props) {
 
   return (
     <React.Fragment>
-      <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
-        open={snackbarOpen}
-        onClose={() => setSnackbarOpen(false)}
-        autoHideDuration={1000}>
-          <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
-            {snackbarMessage}
-          </Alert>
-      </Snackbar>
       <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)} ModalProps={{keepMounted: true}}>
         <Box style={{"width": "250px"}}>
           <List>

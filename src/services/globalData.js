@@ -11,10 +11,11 @@ export const GlobalDataProvider = (props) => {
   const [searchModalOpen, setSearchModalOpen] = React.useState(false);
   const today = React.useMemo(() => (new Date()), []);
   const [selectedDate, setSelectedDate] = React.useState(today);
+  const [snackbarData, setSnackbarData] = React.useState({"open": false, "message": "", "severity": "success", "autoclose": true});
 
   const globalDataMemo = React.useMemo(
-    () => ({ defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today }),
-    [defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today]
+    () => ({ defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today, snackbarData, setSnackbarData }),
+    [defaultTags, tags, setTags, sidebarOpen, setSidebarOpen, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen, selectedDate, setSelectedDate, today, snackbarData, setSnackbarData]
   );
 
   return (
