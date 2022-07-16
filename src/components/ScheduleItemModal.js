@@ -20,7 +20,10 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { format } from 'date-fns';
+import { InputAdornment } from '@mui/material';
+import { useSnackbar } from '../services/snackbar';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
@@ -33,6 +36,7 @@ export default function ScheduleItemModal(props) {
   const { tags } = useGlobalData();
   const [ selectedTagId, setSelectedTagId ] = React.useState("u");
   const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
+  const { openSnackbar } = useSnackbar();
 
   const handleDelete = React.useCallback(() => {
     del(patchUrl, () => props.handleClose("Deleted " + name, "error"));
@@ -66,6 +70,23 @@ export default function ScheduleItemModal(props) {
     setSelectedTagId(e.target.value);
     setTagMenuOpen(false);
   }, [setSelectedTagId, setTagMenuOpen])
+
+  const copyToClipboard = React.useCallback(() => {
+    navigator.clipboard.writeText(name);
+    openSnackbar("Copied to clipboard", "success");
+  }, [name, openSnackbar]);
+
+  const getInputAdornment = React.useCallback(() => {
+    if (props.type !== "create") {
+      return (
+        <InputAdornment position="end">
+          <IconButton edge="end" size="small" onClick={copyToClipboard}>
+            <ContentCopyIcon />
+          </IconButton>
+        </InputAdornment>
+      )
+    }
+  }, [props, copyToClipboard]);
 
   React.useEffect(() => {
     setName(props.name);
@@ -101,6 +122,7 @@ export default function ScheduleItemModal(props) {
             variant="standard"
             required
             error={nameError}
+            InputProps={{endAdornment: getInputAdornment()}}
           />
           <MobileDatePicker
             value={date}
