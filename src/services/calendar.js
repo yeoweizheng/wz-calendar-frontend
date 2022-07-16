@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { startOfWeek, endOfWeek, add } from 'date-fns';
+import { USE_LD } from '../config';
 
 export function useCalendar() {
   const getDateObjInWeek = React.useCallback((selectedDate) => {
@@ -17,7 +18,11 @@ export function useCalendar() {
     return dates
   }, [])
   const getDaysInWeek = React.useCallback(() => {
-    return ["LD", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    if (USE_LD) {
+      return ["LD", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    } else {
+      return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    }
   }, [])
   const getStartEndDateObj = React.useCallback((selectedDate) => {
     let startDateObj = startOfWeek(selectedDate);
