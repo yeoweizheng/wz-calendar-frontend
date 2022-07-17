@@ -77,7 +77,7 @@ export default function ScheduleItemModal(props) {
   }, [name, openSnackbar]);
 
   const getInputAdornment = React.useCallback(() => {
-    if (props.type !== "create") {
+    if (props.type === "edit") {
       return (
         <InputAdornment position="end">
           <IconButton edge="end" size="small" onClick={copyToClipboard}>
