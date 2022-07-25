@@ -74,29 +74,30 @@ export default function WeeklyCalendar() {
     }
   }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, tagModalOpen, datePickerOpen])
 
-  const getScheduleItemsForDate = React.useCallback((scheduleItems, dateObj) => {
-    let items = [];
-    const searchDate = format(dateObj, 'yyyy-MM-dd')
-    for (let item of scheduleItems) {
-      if (item.date === searchDate) items.push(item);
-    }
-    return items;
-  }, []);
-
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     scheduleItems.current = items;
     const dates = getDateObjInWeek(selectedDate);
     const days = getDaysInWeek();
     let data = [];
+    let itemMapping = {};
+    for (let item of items) {
+      if (item.date in itemMapping) {
+        itemMapping[item.date].push(item);
+      } else {
+        itemMapping[item.date] = [item];
+      }
+    }
     for (let i = 0; i < 7; i++) {
+      let dateStr = format(dates[i], "yyyy-MM-dd");
       data.push({
         "date": dates[i],
         "day": days[i], 
-        "items": getScheduleItemsForDate(items, dates[i])})
+        "items": dateStr in itemMapping? itemMapping[dateStr] : []
+      });
     }
     setDisplayData(data);
     loading.current = false;
-  }, [getDateObjInWeek, getDaysInWeek, selectedDate, getScheduleItemsForDate])
+  }, [getDateObjInWeek, getDaysInWeek, selectedDate])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     loading.current = true;
