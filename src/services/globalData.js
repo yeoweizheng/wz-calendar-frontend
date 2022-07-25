@@ -8,7 +8,6 @@ const initialState = {
   selectedTagId: "a",
   tagModalOpen: false,
   searchModalOpen: false,
-  today: new Date(),
   selectedDate: new Date(),
   snackbarData: {"open": false, "message": "", "severity": "success", "autoclose": true}
 };

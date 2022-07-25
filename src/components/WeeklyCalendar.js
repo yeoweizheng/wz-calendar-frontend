@@ -17,7 +17,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useGlobalData } from '../services/globalData';
-import Sidebar from './Sidebar';
 import { useCustomDay } from '../services/customday';
 import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
 import { useSnackbar } from '../services/snackbar';
@@ -29,7 +28,8 @@ export default function WeeklyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": globalData.today, "done": false, "tag": "u"}
+  let today = React.useRef(new Date());
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
@@ -145,8 +145,8 @@ export default function WeeklyCalendar() {
   }, [])
 
   const getSameDayStyle = React.useCallback((date) => {
-    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, globalData.today)? "LightYellow":"White"}
-  }, [globalData.today]);
+    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, today.current)? "LightYellow":"White"}
+  }, [today]);
 
   React.useEffect(() => {
     retrieveScheduleItems(globalData.selectedDate, true);
@@ -159,7 +159,6 @@ export default function WeeklyCalendar() {
 
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
-      <Sidebar />
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
@@ -206,9 +205,9 @@ export default function WeeklyCalendar() {
           </React.Fragment>
         ))}
       </Grid>
-      { isSameWeek(globalData.selectedDate, globalData.today) ? null :
+      { isSameWeek(globalData.selectedDate, today.current) ? null :
         <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(globalData.today)}>Current week</Button>
+          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current week</Button>
         </Stack>
       }
       <ScheduleItemModal 
