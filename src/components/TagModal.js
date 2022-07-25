@@ -20,7 +20,7 @@ import Stack from '@mui/material/Stack';
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
-  const {tags, tagModalOpen} = useGlobalData();
+  const [globalData] = useGlobalData();
   const [selectedTagId, setSelectedTagId] = React.useState("");
   const [tagMenuOpen, setTagMenuOpen] = React.useState(false);
   const {post, patch, del} = useHttp()
@@ -31,10 +31,10 @@ export default function TagModal(props) {
   }, [setName]);
 
   const getTagName = React.useCallback((tagId) => {
-    for(let tag of tags) {
+    for(let tag of globalData.tags) {
       if (tag.id === tagId) return tag.name;
     }
-  }, [tags])
+  }, [globalData.tags])
 
   const handleDelete = React.useCallback(() => {
     if (selectedTagId === "" || selectedTagId === undefined || selectedTagId === null) return;
@@ -68,7 +68,7 @@ export default function TagModal(props) {
     setName("");
     setNameError(false);
     setSelectedTagId("")
-  }, [tagModalOpen])
+  }, [globalData.tagModalOpen])
 
   return (
     <Dialog open={props.open ? props.open : false} onClose={() => props.handleClose()} fullWidth keepMounted>
@@ -99,7 +99,7 @@ export default function TagModal(props) {
                   onOpen={() => setTagMenuOpen(true)}
                   onClose={() => setTagMenuOpen(false)}
                   >
-                  {tags.map((tag) => (
+                  {globalData.tags.map((tag) => (
                     tag.id !== "a" && tag.id !== "u"?
                     <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
                   ))}

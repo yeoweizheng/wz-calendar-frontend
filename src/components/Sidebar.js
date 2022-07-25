@@ -22,27 +22,26 @@ import { useSnackbar } from '../services/snackbar';
 
 
 export default function Sidebar(props) {
-  const { defaultTags, sidebarOpen, setSidebarOpen, tags, setTags, selectedTagId, setSelectedTagId, tagModalOpen, setTagModalOpen, searchModalOpen, setSearchModalOpen } = useGlobalData();
+  const [globalData, setGlobalData] = useGlobalData();
   const { get } = useHttp();
   const [tagModalType, setTagModalType] = React.useState("create");
   const {openSnackbar} = useSnackbar();
   const { logout } = useAuth();
 
   const isTagSelected = React.useCallback((tagId) => {
-    return tagId === selectedTagId;
-  }, [selectedTagId])
+    return tagId === globalData.selectedTagId;
+  }, [globalData.selectedTagId])
 
   const handleSelectTag = React.useCallback((tagId) => {
-    setSelectedTagId(tagId);
-    setSidebarOpen(false);
-  }, [setSelectedTagId, setSidebarOpen])
+    setGlobalData((prev) => ({...prev, selectedTagId: tagId, sidebarOpen: false}))
+  }, [setGlobalData])
 
   const handleRetrieveTags = React.useCallback((data) => {
-    let newTags = defaultTags.slice(0, 1);
+    let newTags = globalData.defaultTags.slice(0, 1);
     newTags = newTags.concat(data);
-    newTags.push(defaultTags[1]);
-    setTags(newTags);
-  }, [defaultTags, setTags])
+    newTags.push(globalData.defaultTags[1]);
+    setGlobalData((prev) => ({...prev, tags: newTags}));
+  }, [globalData.defaultTags, setGlobalData])
 
   const retrieveTags = React.useCallback(() => {
     const url = 'tags/';
@@ -50,30 +49,28 @@ export default function Sidebar(props) {
   }, [get, handleRetrieveTags])
 
   const openTagModal = React.useCallback((type) => {
-    setSidebarOpen(false);
     setTagModalType(type);
-    setTagModalOpen(true);
-  }, [setSidebarOpen, setTagModalType, setTagModalOpen])
+    setGlobalData((prev) => ({...prev, sidebarOpen: false, tagModalOpen: true}));
+  }, [setGlobalData])
 
   const openSearchModal = React.useCallback(() => {
-    setSidebarOpen(false);
-    setSearchModalOpen(true);
-  }, [setSidebarOpen, setSearchModalOpen])
+    setGlobalData((prev) => ({...prev, sidebarOpen: false, searchModalOpen: true}));
+  }, [setGlobalData])
 
   const handleTagModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
       openSnackbar(alertMsg, severity);
     }
-    setTagModalOpen(false);
-  }, [openSnackbar, setTagModalOpen])
+    setGlobalData((prev) => ({...prev, tagModalOpen: false}))
+  }, [openSnackbar, setGlobalData])
 
   React.useEffect(() => {
     retrieveTags();
-  }, [retrieveTags, sidebarOpen, tagModalOpen])
+  }, [retrieveTags, globalData.sidebarOpen, globalData.tagModalOpen])
 
   return (
     <React.Fragment>
-      <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)} ModalProps={{keepMounted: true}}>
+      <Drawer anchor="left" open={globalData.sidebarOpen} onClose={() => setGlobalData((prev) => ({...prev, sidebarOpen: false})) } ModalProps={{keepMounted: true}}>
         <Box style={{"width": "250px"}}>
           <List>
             <ListItem button key="search" onClick={() => openSearchModal()}>
@@ -83,7 +80,7 @@ export default function Sidebar(props) {
           </List>
           <Divider />
           <List>
-            {tags.map((tag) => (
+            {globalData.tags.map((tag) => (
               <ListItem button key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
                 <ListItemIcon>
                 {
@@ -102,7 +99,7 @@ export default function Sidebar(props) {
               <ListItemIcon><AddBoxIcon /></ListItemIcon>
               <ListItemText primary="New Tag" />
             </ListItem>
-            {tags.length > 2 ? 
+            {globalData.tags.length > 2 ? 
               <ListItem button key="editTag" onClick={() => openTagModal("edit")}>
                 <ListItemIcon><EditIcon /></ListItemIcon>
                 <ListItemText primary="Edit Tag" />
@@ -112,7 +109,7 @@ export default function Sidebar(props) {
           </List>
           <Divider />
           <List>
-            <ListItem button key="logout" onClick={() => {setSidebarOpen(false); logout();}}>
+            <ListItem button key="logout" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false})); logout();}}>
               <ListItemIcon><LogoutIcon /></ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItem>
@@ -120,12 +117,12 @@ export default function Sidebar(props) {
         </Box>
       </Drawer>
       <TagModal
-        open={tagModalOpen}
+        open={globalData.tagModalOpen}
         type={tagModalType}
         handleClose={(alertMsg, severity) => handleTagModalClose(alertMsg, severity)}
       />
       <SearchModal
-        open={searchModalOpen}
+        open={globalData.searchModalOpen}
       />
     </React.Fragment>
   )

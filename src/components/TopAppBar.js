@@ -10,11 +10,11 @@ import { useGlobalData } from '../services/globalData';
 export default function TopAppBar() {
 
   const { isAuthenticated } = useAuth();
-  const { sidebarOpen, setSidebarOpen } = useGlobalData();
+  const [,setGlobalData] = useGlobalData();
 
   const toggleSidebar = React.useCallback(() => {
-    setSidebarOpen(!sidebarOpen);
-  }, [sidebarOpen, setSidebarOpen])
+    setGlobalData((prev) => ({...prev, sidebarOpen: !prev.sidebarOpen}))
+  }, [setGlobalData])
 
   return (
     <AppBar position="static">

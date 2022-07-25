@@ -33,7 +33,7 @@ export default function ScheduleItemModal(props) {
   const {post, patch, del} = useHttp()
   const baseUrl = 'schedule_items/';
   const patchUrl = baseUrl + props.id + '/';
-  const { tags } = useGlobalData();
+  const [globalData] = useGlobalData();
   const [ selectedTagId, setSelectedTagId ] = React.useState("u");
   const [ tagMenuOpen, setTagMenuOpen ] = React.useState(false);
   const { openSnackbar } = useSnackbar();
@@ -147,7 +147,7 @@ export default function ScheduleItemModal(props) {
               onOpen={() => setTagMenuOpen(true)}
               onClose={() => setTagMenuOpen(false)}
               >
-              {tags.map((tag) => (
+              {globalData.tags.map((tag) => (
                 tag.id !== "a"?
                 <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
               ))}

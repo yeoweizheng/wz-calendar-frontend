@@ -17,7 +17,7 @@ export default function SearchModal(props) {
   const { get } = useHttp();
   const [searchItems, setSearchItems] = React.useState([]);
   const [searchStr, setSearchStr] = React.useState("");
-  const {setSelectedDate, setSearchModalOpen} = useGlobalData();
+  const [, setGlobalData] = useGlobalData();
 
   const handleRetrieveSearchItems = React.useCallback((data, searchStr) => {
     if (searchStr !== "") {
@@ -35,17 +35,16 @@ export default function SearchModal(props) {
   }, [get, handleRetrieveSearchItems, setSearchStr])
 
   const handleSearchItemClick = React.useCallback((item) => {
-    setSearchModalOpen(false);
     setSearchStr("");
     setSearchItems([]);
-    setSelectedDate(parse(item.date, "yyyy-MM-dd", new Date()));
-  }, [setSearchModalOpen, setSelectedDate, setSearchStr, setSearchItems])
+    setGlobalData((prev) => ({ ...prev, searchModalOpen: false, selectedDate: parse(item.date, "yyyy-MM-dd", new Date()) }))
+  }, [setGlobalData, setSearchStr, setSearchItems])
 
   const handleClose = React.useCallback(() => {
-    setSearchModalOpen(false);
     setSearchStr("");
     setSearchItems([]);
-  }, [setSearchStr, setSearchModalOpen])
+    setGlobalData((prev) => ({ ...prev, searchModalOpen: false }));
+  }, [setSearchStr, setGlobalData])
 
   return (
     <Dialog open={props.open ? props.open : false} onClose={() => handleClose()} fullWidth keepMounted>

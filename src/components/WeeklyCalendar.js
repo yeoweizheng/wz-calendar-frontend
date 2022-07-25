@@ -26,10 +26,10 @@ export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
-  const {selectedTagId, tagModalOpen, selectedDate, setSelectedDate, today} = useGlobalData();
+  const [globalData, setGlobalData] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false, "tag": "u"}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": globalData.today, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
@@ -38,45 +38,45 @@ export default function WeeklyCalendar() {
   let loading = React.useRef(true);
 
   const setSelectedDateForAll = React.useCallback((date) => {
-    setSelectedDate(date);
+    setGlobalData((prev) => ({...prev, selectedDate: date}))
     setCustomDayValue(date);
-  }, [setSelectedDate, setCustomDayValue])
+  }, [setGlobalData, setCustomDayValue])
 
   const gotoNextWeek = React.useCallback(() => {
-    const newDate = add(selectedDate, {"weeks": 1})
+    const newDate = add(globalData.selectedDate, {"weeks": 1})
     setSelectedDateForAll(newDate);
-  }, [setSelectedDateForAll, selectedDate])
+  }, [setSelectedDateForAll, globalData.selectedDate])
 
   const gotoPrevWeek = React.useCallback(() => {
-    const newDate = sub(selectedDate, {"weeks": 1})
+    const newDate = sub(globalData.selectedDate, {"weeks": 1})
     setSelectedDateForAll(newDate);
-  }, [setSelectedDateForAll, selectedDate])
+  }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleSwipe = React.useCallback((e) => {
-    if (loading.current || modalOpen || tagModalOpen || datePickerOpen) return;
+    if (loading.current || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
     if (e.dir === "Left") {
       gotoNextWeek();
     } else if (e.dir === "Right") {
       gotoPrevWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, tagModalOpen, datePickerOpen])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen])
 
   const swipeHandler = useSwipeable({
     onSwiped: (e) => handleSwipe(e)
   })
 
   const handleKeyUp = React.useCallback((e) => {
-    if (loading.current || modalOpen || tagModalOpen || datePickerOpen) return;
+    if (loading.current || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
     if (e.keyCode === 37) {
       gotoPrevWeek();
     } else if (e.keyCode === 39) {
       gotoNextWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, tagModalOpen, datePickerOpen])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen])
 
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     scheduleItems.current = items;
-    const dates = getDateObjInWeek(selectedDate);
+    const dates = getDateObjInWeek(globalData.selectedDate);
     const days = getDaysInWeek();
     let data = [];
     let itemMapping = {};
@@ -97,23 +97,23 @@ export default function WeeklyCalendar() {
     }
     setDisplayData(data);
     loading.current = false;
-  }, [getDateObjInWeek, getDaysInWeek, selectedDate])
+  }, [getDateObjInWeek, getDaysInWeek, globalData.selectedDate])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     loading.current = true;
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
-    if (selectedTagId !== "a") {
-      url += "&tag=" + selectedTagId
+    if (globalData.selectedTagId !== "a") {
+      url += "&tag=" + globalData.selectedTagId
     }
     get(url, handleRetrieveScheduleItems);
-  }, [get, getStartEndDateObj, handleRetrieveScheduleItems, selectedTagId]);
+  }, [get, getStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
       let modalItem = {...defaultModalItem};
       modalItem.date = date;
-      modalItem.tag = selectedTagId === "a"? "u" : selectedTagId;
+      modalItem.tag = globalData.selectedTagId === "a"? "u" : globalData.selectedTagId;
       setModalItem(modalItem);
     } else {
       for (let item of scheduleItems.current) {
@@ -145,12 +145,12 @@ export default function WeeklyCalendar() {
   }, [])
 
   const getSameDayStyle = React.useCallback((date) => {
-    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, today)? "LightYellow":"White"}
-  }, [today]);
+    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, globalData.today)? "LightYellow":"White"}
+  }, [globalData.today]);
 
   React.useEffect(() => {
-    retrieveScheduleItems(selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
+    retrieveScheduleItems(globalData.selectedDate, true);
+  }, [getDateObjInWeek, getDaysInWeek, retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -164,7 +164,7 @@ export default function WeeklyCalendar() {
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
           <MobileDatePicker
-            value={selectedDate}
+            value={globalData.selectedDate}
             label="Select week"
             onChange={(value) => {setCustomDayValue(value)}}
             onAccept={(value) => {setSelectedDateForAll(value)}}
@@ -206,9 +206,9 @@ export default function WeeklyCalendar() {
           </React.Fragment>
         ))}
       </Grid>
-      { isSameWeek(selectedDate, today) ? null :
+      { isSameWeek(globalData.selectedDate, globalData.today) ? null :
         <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today)}>Current week</Button>
+          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(globalData.today)}>Current week</Button>
         </Stack>
       }
       <ScheduleItemModal 
