@@ -27,15 +27,15 @@ export default function WeeklyCalendar() {
   const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
   const {selectedTagId, tagModalOpen, selectedDate, setSelectedDate, today} = useGlobalData();
-  const [scheduleItems, setScheduleItems] = React.useState([]);
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
-  const [loading, setLoading] = React.useState(true);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
   const {openSnackbar} = useSnackbar();
+  let scheduleItems = React.useRef([]);
+  let loading = React.useRef(true);
 
   const setSelectedDateForAll = React.useCallback((date) => {
     setSelectedDate(date);
@@ -53,7 +53,7 @@ export default function WeeklyCalendar() {
   }, [setSelectedDateForAll, selectedDate])
 
   const handleSwipe = React.useCallback((e) => {
-    if (loading || modalOpen || tagModalOpen || datePickerOpen) return;
+    if (loading.current || modalOpen || tagModalOpen || datePickerOpen) return;
     if (e.dir === "Left") {
       gotoNextWeek();
     } else if (e.dir === "Right") {
@@ -66,7 +66,7 @@ export default function WeeklyCalendar() {
   })
 
   const handleKeyUp = React.useCallback((e) => {
-    if (loading || modalOpen || tagModalOpen || datePickerOpen) return;
+    if (loading.current || modalOpen || tagModalOpen || datePickerOpen) return;
     if (e.keyCode === 37) {
       gotoPrevWeek();
     } else if (e.keyCode === 39) {
@@ -83,7 +83,8 @@ export default function WeeklyCalendar() {
     return items;
   }, []);
 
-  const generateDisplayData = React.useCallback((scheduleItems) => {
+  const handleRetrieveScheduleItems = React.useCallback((items) => {
+    scheduleItems.current = items;
     const dates = getDateObjInWeek(selectedDate);
     const days = getDaysInWeek();
     let data = [];
@@ -91,19 +92,14 @@ export default function WeeklyCalendar() {
       data.push({
         "date": dates[i],
         "day": days[i], 
-        "items": getScheduleItemsForDate(scheduleItems, dates[i])})
+        "items": getScheduleItemsForDate(items, dates[i])})
     }
     setDisplayData(data);
-    setLoading(false);
+    loading.current = false;
   }, [getDateObjInWeek, getDaysInWeek, selectedDate, getScheduleItemsForDate])
 
-  const handleRetrieveScheduleItems = React.useCallback((data) => {
-    setScheduleItems(data);
-    generateDisplayData(data);
-  }, [setScheduleItems, generateDisplayData]);
-
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
-    setLoading(true);
+    loading.current = true;
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
     if (selectedTagId !== "a") {
@@ -119,7 +115,7 @@ export default function WeeklyCalendar() {
       modalItem.tag = selectedTagId === "a"? "u" : selectedTagId;
       setModalItem(modalItem);
     } else {
-      for (let item of scheduleItems) {
+      for (let item of scheduleItems.current) {
         if (id === item.id) {
           let modalItem = {...item};
           modalItem["type"] = "edit";
@@ -153,7 +149,7 @@ export default function WeeklyCalendar() {
 
   React.useEffect(() => {
     retrieveScheduleItems(selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, generateDisplayData, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
+  }, [getDateObjInWeek, getDaysInWeek, retrieveScheduleItems, selectedDate, modalOpen, selectedTagId, tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
