@@ -71,7 +71,7 @@ export default function TagModal(props) {
   }, [globalData.tagModalOpen])
 
   return (
-    <Dialog open={props.open ? props.open : false} onClose={() => props.handleClose()} fullWidth keepMounted>
+    <Dialog open={props.open ? props.open : false} onClose={props.handleClose} fullWidth keepMounted>
       <DialogTitle>
         <Box style={{"display": "flex"}}>
           <Box className="spacer-box">
@@ -80,7 +80,7 @@ export default function TagModal(props) {
             </Typography>
           </Box>
           <Box>
-            <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>
+            <IconButton onClick={props.handleClose}><CloseIcon /></IconButton>
           </Box>
         </Box>
       </DialogTitle>

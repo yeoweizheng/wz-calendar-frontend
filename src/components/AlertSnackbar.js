@@ -10,9 +10,9 @@ export default function AlertSnackbar() {
     return (
         <Snackbar anchorOrigin={{"vertical": "top", "horizontal": "center"}} 
         open={globalData.snackbarData["open"]}
-        onClose={() => closeSnackbar()}
+        onClose={closeSnackbar}
         autoHideDuration={globalData.snackbarData["autoclose"]? 1000 : null}>
-            <Alert onClose={() => closeSnackbar} severity={globalData.snackbarData["severity"]}>
+            <Alert onClose={closeSnackbar} severity={globalData.snackbarData["severity"]}>
             {globalData.snackbarData["message"]}
             </Alert>
         </Snackbar>

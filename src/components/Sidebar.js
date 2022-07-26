@@ -73,7 +73,7 @@ export default function Sidebar(props) {
       <Drawer anchor="left" open={globalData.sidebarOpen} onClose={() => setGlobalData((prev) => ({...prev, sidebarOpen: false})) } ModalProps={{keepMounted: true}}>
         <Box style={{"width": "250px"}}>
           <List>
-            <ListItem button key="search" onClick={() => openSearchModal()}>
+            <ListItem button key="search" onClick={openSearchModal}>
               <ListItemIcon><SearchIcon /></ListItemIcon>
               <ListItemText primary="Search" />
             </ListItem>

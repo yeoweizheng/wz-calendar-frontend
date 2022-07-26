@@ -47,7 +47,7 @@ export default function SearchModal(props) {
   }, [setSearchStr, setGlobalData])
 
   return (
-    <Dialog open={props.open ? props.open : false} onClose={() => handleClose()} fullWidth keepMounted>
+    <Dialog open={props.open ? props.open : false} onClose={handleClose} fullWidth keepMounted>
       <DialogContent>
         <Stack direction="row" sx={{p: 0}}>
           <TextField

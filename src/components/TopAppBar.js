@@ -20,7 +20,7 @@ export default function TopAppBar() {
     <AppBar position="static">
       <Toolbar>
         { isAuthenticated() ? 
-          <IconButton color="inherit" edge="start" sx={{ mr:2 }} onClick={() => toggleSidebar()}> <MenuIcon /> </IconButton>
+          <IconButton color="inherit" edge="start" sx={{ mr:2 }} onClick={toggleSidebar}> <MenuIcon /> </IconButton>
           : null
         }
         <Typography variant="h6" component="div"> WZ Calendar </Typography>

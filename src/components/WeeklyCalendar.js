@@ -161,7 +161,7 @@ export default function WeeklyCalendar() {
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
-          <IconButton color="primary" onClick={() => gotoPrevWeek()}><ArrowBackIcon /></IconButton>
+          <IconButton color="primary" onClick={gotoPrevWeek}><ArrowBackIcon /></IconButton>
           <MobileDatePicker
             value={globalData.selectedDate}
             label="Select week"
@@ -174,9 +174,10 @@ export default function WeeklyCalendar() {
             renderInput={(params) => {
               return <TextField size="small" {...params} />}
             }
+            reduceAnimations={true}
             keepMounted
           />
-          <IconButton color="primary" onClick={() => gotoNextWeek()}><ArrowForwardIcon /></IconButton>
+          <IconButton color="primary" onClick={gotoNextWeek}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
       <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>

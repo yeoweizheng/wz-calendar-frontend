@@ -133,6 +133,7 @@ export default function ScheduleItemModal(props) {
             renderInput={(params) => {
               return <TextField size="small" variant="standard" fullWidth {...params} />}
             }
+            reduceAnimations={true}
             keepMounted
           />
           <FormControl fullWidth>
