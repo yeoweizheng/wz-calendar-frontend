@@ -64,6 +64,8 @@ export default function TagModal(props) {
     setTagMenuOpen(false);
   }, [setSelectedTagId, setTagMenuOpen])
 
+  const closeDialog = React.useCallback(() => {props.handleClose()}, [props]);
+
   React.useEffect(() => {
     setName("");
     setNameError(false);
@@ -71,7 +73,7 @@ export default function TagModal(props) {
   }, [globalData.tagModalOpen])
 
   return (
-    <Dialog open={props.open ? props.open : false} onClose={props.handleClose} fullWidth keepMounted>
+    <Dialog open={props.open ? props.open : false} onClose={closeDialog} fullWidth keepMounted>
       <DialogTitle>
         <Box style={{"display": "flex"}}>
           <Box className="spacer-box">
@@ -80,7 +82,7 @@ export default function TagModal(props) {
             </Typography>
           </Box>
           <Box>
-            <IconButton onClick={props.handleClose}><CloseIcon /></IconButton>
+            <IconButton onClick={closeDialog}><CloseIcon /></IconButton>
           </Box>
         </Box>
       </DialogTitle>
