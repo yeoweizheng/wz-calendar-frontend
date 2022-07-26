@@ -88,6 +88,8 @@ export default function ScheduleItemModal(props) {
     }
   }, [props, copyToClipboard]);
 
+  const closeDialog = React.useCallback(() => {props.handleClose()}, [props]);
+
   React.useEffect(() => {
     setName(props.name);
     setNameError(false);
@@ -98,7 +100,7 @@ export default function ScheduleItemModal(props) {
   }, [props.name, props.date, props.done, props.tag])
 
   return (
-    <Dialog open={props.open? props.open:false} onClose={() => props.handleClose()} fullWidth keepMounted>
+    <Dialog open={props.open? props.open:false} onClose={closeDialog} fullWidth keepMounted>
       <DialogTitle>
         <Box style={{"display": "flex"}}>
           <Box className="spacer-box">
@@ -107,7 +109,7 @@ export default function ScheduleItemModal(props) {
             </Typography>
           </Box>
           <Box>
-            <IconButton onClick={() => props.handleClose()}><CloseIcon /></IconButton>
+            <IconButton onClick={closeDialog}><CloseIcon /></IconButton>
           </Box>
         </Box>
       </DialogTitle>
