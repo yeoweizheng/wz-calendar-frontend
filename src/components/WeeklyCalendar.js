@@ -150,7 +150,7 @@ export default function WeeklyCalendar() {
 
   React.useEffect(() => {
     retrieveScheduleItems(globalData.selectedDate, true);
-  }, [getDateObjInWeek, getDaysInWeek, retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
+  }, [retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
