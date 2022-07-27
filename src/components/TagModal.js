@@ -20,7 +20,7 @@ import Stack from '@mui/material/Stack';
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
   const [nameError, setNameError] = React.useState(false);
-  const [globalData] = useGlobalData();
+  const [globalData, setGlobalData] = useGlobalData();
   const [selectedTagId, setSelectedTagId] = React.useState("");
   const [tagMenuOpen, setTagMenuOpen] = React.useState(false);
   const {post, patch, del} = useHttp()
@@ -39,9 +39,13 @@ export default function TagModal(props) {
   const handleDelete = React.useCallback(() => {
     if (selectedTagId === "" || selectedTagId === undefined || selectedTagId === null) return;
     const patchUrl = baseUrl + selectedTagId + '/';
-    del(patchUrl, () => props.handleClose("Deleted " + getTagName(selectedTagId), "error"), 
+    del(patchUrl, () => {
+      setSelectedTagId("");
+      if (globalData.selectedTagId === selectedTagId) setGlobalData((prev) => ({...prev, selectedTagId: "a"}));
+      props.handleClose("Deleted " + getTagName(selectedTagId), "error");
+    }, 
       () => props.handleClose("Error deleting " + getTagName(selectedTagId), "error"));
-  }, [props, del, selectedTagId, getTagName])
+  }, [props, del, selectedTagId, getTagName, globalData, setGlobalData])
 
   const handleSave = React.useCallback(() => {
     if (name === "" || name === undefined || name === null) {
@@ -67,9 +71,11 @@ export default function TagModal(props) {
   const closeDialog = React.useCallback(() => {props.handleClose()}, [props]);
 
   React.useEffect(() => {
-    setName("");
-    setNameError(false);
-    setSelectedTagId("")
+    if (globalData.tagModalOpen) {
+      setName("");
+      setNameError(false);
+      setSelectedTagId("")
+    }
   }, [globalData.tagModalOpen])
 
   return (

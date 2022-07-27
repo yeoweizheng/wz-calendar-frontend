@@ -149,7 +149,7 @@ export default function WeeklyCalendar() {
   }, [today]);
 
   React.useEffect(() => {
-    retrieveScheduleItems(globalData.selectedDate, true);
+    if (!modalOpen) retrieveScheduleItems(globalData.selectedDate, true);
   }, [retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {

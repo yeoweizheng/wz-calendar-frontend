@@ -65,7 +65,7 @@ export default function Sidebar(props) {
   }, [openSnackbar, setGlobalData])
 
   React.useEffect(() => {
-    retrieveTags();
+    if (!globalData.tagModalOpen) retrieveTags();
   }, [retrieveTags, globalData.tagModalOpen])
 
   return (
