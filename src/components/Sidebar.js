@@ -66,7 +66,7 @@ export default function Sidebar(props) {
 
   React.useEffect(() => {
     retrieveTags();
-  }, [retrieveTags, globalData.sidebarOpen, globalData.tagModalOpen])
+  }, [retrieveTags, globalData.tagModalOpen])
 
   return (
     <React.Fragment>
