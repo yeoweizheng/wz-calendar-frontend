@@ -16,13 +16,10 @@ export function useCalendar() {
     }
     return dates
   }, [])
-  const getDaysInWeek = React.useCallback(() => {
-    return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  }, [])
   const getStartEndDateObj = React.useCallback((selectedDate) => {
     let startDateObj = startOfWeek(selectedDate);
     let endDateObj = endOfWeek(selectedDate);
     return [startDateObj, endDateObj];
   }, []);
-  return { getDateObjInWeek, getDaysInWeek, getStartEndDateObj }
+  return { getDateObjInWeek, getStartEndDateObj }
 }

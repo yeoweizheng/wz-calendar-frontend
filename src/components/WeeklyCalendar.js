@@ -23,7 +23,7 @@ import { useSnackbar } from '../services/snackbar';
 
 export default function WeeklyCalendar() {
 
-  const { getDateObjInWeek, getDaysInWeek, getStartEndDateObj } = useCalendar();
+  const { getDateObjInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
   const [globalData, setGlobalData] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
@@ -77,7 +77,6 @@ export default function WeeklyCalendar() {
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     scheduleItems.current = items;
     const dates = getDateObjInWeek(globalData.selectedDate);
-    const days = getDaysInWeek();
     let data = [];
     let itemMapping = {};
     for (let item of items) {
@@ -91,13 +90,13 @@ export default function WeeklyCalendar() {
       let dateStr = format(dates[i], "yyyy-MM-dd");
       data.push({
         "date": dates[i],
-        "day": days[i], 
+        "day": format(dates[i], "E"),
         "items": dateStr in itemMapping? itemMapping[dateStr] : []
       });
     }
     setDisplayData(data);
     loading.current = false;
-  }, [getDateObjInWeek, getDaysInWeek, globalData.selectedDate])
+  }, [getDateObjInWeek, globalData.selectedDate])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     loading.current = true;
