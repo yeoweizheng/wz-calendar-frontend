@@ -20,6 +20,8 @@ import { useGlobalData } from '../services/globalData';
 import { useCustomDay } from '../services/customday';
 import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
 import { useSnackbar } from '../services/snackbar';
+import Fade from '@mui/material/Fade';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export default function WeeklyCalendar() {
 
@@ -34,8 +36,8 @@ export default function WeeklyCalendar() {
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
   const {openSnackbar} = useSnackbar();
+  const [loading, setLoading] = React.useState(false);
   let scheduleItems = React.useRef([]);
-  let loading = React.useRef(true);
 
   const setSelectedDateForAll = React.useCallback((date) => {
     setGlobalData((prev) => ({...prev, selectedDate: date}))
@@ -53,7 +55,7 @@ export default function WeeklyCalendar() {
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleSwipe = React.useCallback((e) => {
-    if (loading.current || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
+    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
     if (e.dir === "Left") {
       gotoNextWeek();
     } else if (e.dir === "Right") {
@@ -66,7 +68,7 @@ export default function WeeklyCalendar() {
   })
 
   const handleKeyUp = React.useCallback((e) => {
-    if (loading.current || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
+    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
     if (e.keyCode === 37) {
       gotoPrevWeek();
     } else if (e.keyCode === 39) {
@@ -94,12 +96,12 @@ export default function WeeklyCalendar() {
         "items": dateStr in itemMapping? itemMapping[dateStr] : []
       });
     }
+    setLoading(false);
     setDisplayData(data);
-    loading.current = false;
   }, [getDateObjInWeek, globalData.selectedDate])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
-    loading.current = true;
+    setLoading(true);
     const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
     if (globalData.selectedTagId !== "a") {
@@ -158,6 +160,7 @@ export default function WeeklyCalendar() {
 
   return (
     <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
+      <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={gotoPrevWeek}><ArrowBackIcon /></IconButton>
