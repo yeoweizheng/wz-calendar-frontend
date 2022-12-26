@@ -19,10 +19,6 @@ import TagModal from './TagModal';
 import { useAuth } from '../services/auth';
 import SearchModal from './SearchModal';
 import { useSnackbar } from '../services/snackbar';
-import Switch from '@mui/material/Switch';
-import { useDarkreader } from 'react-darkreader';
-import { useCookies } from 'react-cookie';
-import { add } from 'date-fns';
 
 
 export default function Sidebar(props) {
@@ -31,8 +27,6 @@ export default function Sidebar(props) {
   const [tagModalType, setTagModalType] = React.useState("create");
   const {openSnackbar} = useSnackbar();
   const { logout } = useAuth();
-  const [cookies, setCookie] = useCookies(['darkMode'])
-  const [isDark, {toggle}] = useDarkreader(cookies.darkMode === "true", {brightness: 125, contrast: 100});
 
   const isTagSelected = React.useCallback((tagId) => {
     return tagId === globalData.selectedTagId;
@@ -74,10 +68,6 @@ export default function Sidebar(props) {
     if (!globalData.tagModalOpen) retrieveTags();
   }, [retrieveTags, globalData.tagModalOpen])
 
-  React.useEffect(() => {
-    setCookie('darkMode', isDark, { path: '/', sameSite: "strict", expires: add(new Date(), {"years": 1})})
-  }, [isDark, setCookie]);
-
   return (
     <React.Fragment>
       <Drawer anchor="left" open={globalData.sidebarOpen} onClose={() => setGlobalData((prev) => ({...prev, sidebarOpen: false})) } ModalProps={{keepMounted: true}}>
@@ -117,13 +107,6 @@ export default function Sidebar(props) {
               : null
             }
           </List>
-          <Divider />
-            <List>
-              <ListItem key="darkMode" onClick={toggle} sx={{cursor: "pointer"}}>
-                <ListItemIcon><Switch checked={isDark}/></ListItemIcon>
-                <ListItemText primary="Dark Mode" />
-                </ListItem>
-            </List>
           <Divider />
           <List>
             <ListItem button key="logout" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false})); logout();}}>
