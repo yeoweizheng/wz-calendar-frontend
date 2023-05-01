@@ -1,4 +1,4 @@
-## WZ Calendar (React frontend)
+# WZ Calendar (React frontend)
 This is a simple weekly calendar built on React with Material UI, supported by a Django REST backend under the [wz-calendar-backend](https://github.com/yeoweizheng/wz-calendar-backend) repo. Features include:
 - Creating, updating & deleting scheduled items
 - Search
