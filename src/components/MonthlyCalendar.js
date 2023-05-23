@@ -19,7 +19,7 @@ import Button from '@mui/material/Button';
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
-  const {getDateObjInMonth, getMonthStartEndDateObj} = useCalendar();
+  const {getDateObjInMonth, getMonthStartEndDateObj, getDaysInWeek} = useCalendar();
   const [displayData, setDisplayData] = React.useState([]);
   const { get } = useHttp();
   const theme = useTheme();
@@ -155,6 +155,13 @@ export default function MonthlyCalendar() {
           <IconButton color="primary" onClick={gotoNextMonth}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
+      <Grid container justifyContent="space-evenly">
+        {getDaysInWeek().map((day) => (
+          <Grid item sx={{flex: 1, border: 1, borderColor: "grey.300", py: 0.5}} key={day}>
+            <Typography variant="body2" component="p" align="center" fontWeight="medium">{day}</Typography>
+          </Grid>
+        ))}
+      </Grid>
       {displayData.map((weekData) => (
         <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].day+"-week"}>
           {weekData.map((dayData) => (
