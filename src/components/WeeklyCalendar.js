@@ -27,22 +27,17 @@ export default function WeeklyCalendar() {
 
   const { getDateObjInWeek, getStartEndDateObj } = useCalendar();
   const { get } = useHttp();
-  const [globalData, setGlobalData] = useGlobalData();
+  const [globalData,] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
   let today = React.useRef(new Date());
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
-  const {renderWeekPickerDay, setCustomDayValue} = useCustomDay();
+  const {renderWeekPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const {openSnackbar} = useSnackbar();
   const [loading, setLoading] = React.useState(false);
   let scheduleItems = React.useRef([]);
-
-  const setSelectedDateForAll = React.useCallback((date) => {
-    setGlobalData((prev) => ({...prev, selectedDate: date}))
-    setCustomDayValue(date);
-  }, [setGlobalData, setCustomDayValue])
 
   const gotoNextWeek = React.useCallback(() => {
     const newDate = add(globalData.selectedDate, {"weeks": 1})
@@ -55,26 +50,26 @@ export default function WeeklyCalendar() {
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleSwipe = React.useCallback((e) => {
-    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
+    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
     if (e.dir === "Left") {
       gotoNextWeek();
     } else if (e.dir === "Right") {
       gotoPrevWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
 
   const swipeHandler = useSwipeable({
     onSwiped: (e) => handleSwipe(e)
   })
 
   const handleKeyUp = React.useCallback((e) => {
-    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen) return;
+    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
     if (e.keyCode === 37) {
       gotoPrevWeek();
     } else if (e.keyCode === 39) {
       gotoNextWeek();
     }
-  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen])
+  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
 
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     scheduleItems.current = items;

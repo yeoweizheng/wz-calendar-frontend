@@ -9,7 +9,8 @@ const initialState = {
   tagModalOpen: false,
   searchModalOpen: false,
   selectedDate: new Date(),
-  snackbarData: {"open": false, "message": "", "severity": "success", "autoclose": true}
+  snackbarData: {"open": false, "message": "", "severity": "success", "autoclose": true},
+  calView: "weekly",  // weekly or monthly
 };
 
 const useGlobalState = () => React.useState(initialState);
