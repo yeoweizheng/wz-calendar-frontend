@@ -16,6 +16,8 @@ import TextField from '@mui/material/TextField';
 import { useCustomDay } from '../services/customday';
 import { useSwipeable } from 'react-swipeable';
 import Button from '@mui/material/Button';
+import Fade from '@mui/material/Fade';
+import LinearProgress from '@mui/material/LinearProgress';
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
@@ -134,6 +136,7 @@ export default function MonthlyCalendar() {
 
   return (
     <Container sx={{p: 0}} {...swipeHandler}>
+      <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center" sx={{mb: 1}}>
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={gotoPrevMonth}><ArrowBackIcon /></IconButton>
