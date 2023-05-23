@@ -33,7 +33,7 @@ export default function TopAppBar() {
         <Typography variant="h6" component="div" sx={{ flex: 1 }}> WZ Calendar </Typography>
         { isAuthenticated() ?
           <React.Fragment>
-            <IconButton color="inherit" onClick={toggleCalView}> {globalData.calView === "weekly" ? <CalendarTodayIcon /> : <CalendarViewMonthIcon />} </IconButton>
+            <IconButton color="inherit" onClick={toggleCalView}> {globalData.calView === "weekly" ? <CalendarViewMonthIcon /> : <CalendarTodayIcon />} </IconButton>
           </React.Fragment>
           : null
         }
