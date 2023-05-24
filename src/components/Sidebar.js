@@ -12,12 +12,10 @@ import LabelOffIcon from '@mui/icons-material/LabelOff';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
-import SearchIcon from '@mui/icons-material/Search';
 import Divider from '@mui/material/Divider';
 import { useHttp } from '../services/http';
 import TagModal from './TagModal';
 import { useAuth } from '../services/auth';
-import SearchModal from './SearchModal';
 import { useSnackbar } from '../services/snackbar';
 
 
@@ -53,10 +51,6 @@ export default function Sidebar(props) {
     setGlobalData((prev) => ({...prev, sidebarOpen: false, tagModalOpen: true}));
   }, [setGlobalData])
 
-  const openSearchModal = React.useCallback(() => {
-    setGlobalData((prev) => ({...prev, sidebarOpen: false, searchModalOpen: true}));
-  }, [setGlobalData])
-
   const handleTagModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
       openSnackbar(alertMsg, severity);
@@ -72,13 +66,6 @@ export default function Sidebar(props) {
     <React.Fragment>
       <Drawer anchor="left" open={globalData.sidebarOpen} onClose={() => setGlobalData((prev) => ({...prev, sidebarOpen: false})) } ModalProps={{keepMounted: true}}>
         <Box style={{"width": "250px"}}>
-          <List>
-            <ListItem button key="search" onClick={openSearchModal}>
-              <ListItemIcon><SearchIcon /></ListItemIcon>
-              <ListItemText primary="Search" />
-            </ListItem>
-          </List>
-          <Divider />
           <List>
             {globalData.tags.map((tag) => (
               <ListItem button key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
@@ -120,9 +107,6 @@ export default function Sidebar(props) {
         open={globalData.tagModalOpen}
         type={tagModalType}
         handleClose={(alertMsg, severity) => handleTagModalClose(alertMsg, severity)}
-      />
-      <SearchModal
-        open={globalData.searchModalOpen}
       />
     </React.Fragment>
   )

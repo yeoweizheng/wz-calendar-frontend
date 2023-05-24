@@ -2,6 +2,7 @@ import * as React from 'react';
 import Sidebar from './Sidebar';
 import WeeklyCalendar from './WeeklyCalendar';
 import MonthlyCalendar from './MonthlyCalendar';
+import SearchModal from './SearchModal';
 import { useGlobalData } from '../services/globalData';
 
 export default function MainContainer(props) {
@@ -13,6 +14,9 @@ export default function MainContainer(props) {
         <WeeklyCalendar /> :
         <MonthlyCalendar />
       }
+      <SearchModal
+        open={globalData.searchModalOpen}
+      />
     </React.Fragment>
   )
 }

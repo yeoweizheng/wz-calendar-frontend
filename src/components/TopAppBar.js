@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth'
+import SearchIcon from '@mui/icons-material/Search';
 import { useAuth } from "../services/auth";
 import { useGlobalData } from '../services/globalData';
 
@@ -18,6 +19,10 @@ export default function TopAppBar() {
     setGlobalData((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }))
   }, [setGlobalData])
 
+  const openSearchModal = React.useCallback(() => {
+    setGlobalData((prev) => ({...prev, searchModalOpen: true}));
+  }, [setGlobalData])
+
   const toggleCalView = React.useCallback(() => {
     let calView = globalData.calView === "weekly" ? "monthly" : "weekly";
     setGlobalData((prev) => ({ ...prev, calView: calView }));
@@ -26,7 +31,7 @@ export default function TopAppBar() {
   return (
     <React.Fragment>
       <AppBar position="fixed">
-        <Toolbar>
+        <Toolbar variant="dense">
           {isAuthenticated() ?
             <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={toggleSidebar}> <MenuIcon /> </IconButton>
             : null
@@ -34,13 +39,14 @@ export default function TopAppBar() {
           <Typography variant="h6" component="div" sx={{ flex: 1 }}> WZ Calendar </Typography>
           {isAuthenticated() ?
             <React.Fragment>
+              <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={openSearchModal}> <SearchIcon /> </IconButton>
               <IconButton color="inherit" onClick={toggleCalView}> {globalData.calView === "weekly" ? <CalendarViewMonthIcon /> : <CalendarTodayIcon />} </IconButton>
             </React.Fragment>
             : null
           }
         </Toolbar>
       </AppBar>
-      <Toolbar />
+      <Toolbar variant="dense" />
     </React.Fragment>
   );
 }
