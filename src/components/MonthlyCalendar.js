@@ -166,7 +166,7 @@ export default function MonthlyCalendar() {
         ))}
       </Grid>
       {displayData.map((weekData) => (
-        <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].day+"-week"}>
+        <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].date}>
           {weekData.map((dayData) => (
             <Grid item zeroMinWidth sx={getDayStyle(dayData.date)} onClick={() => gotoWeek(dayData.date)} key={dayData.day}>
               <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
