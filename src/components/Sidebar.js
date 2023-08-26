@@ -17,7 +17,6 @@ import { useHttp } from '../services/http';
 import TagModal from './TagModal';
 import { useAuth } from '../services/auth';
 import { useSnackbar } from '../services/snackbar';
-import { nanoid } from 'nanoid';
 
 
 export default function Sidebar(props) {
@@ -69,7 +68,7 @@ export default function Sidebar(props) {
         <Box style={{"width": "250px"}}>
           <List>
             {globalData.tags.map((tag) => (
-              <ListItem button key={nanoid()} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
+              <ListItem button key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
                 <ListItemIcon>
                 {
                   tag.id === "a"? <CalendarTodayIcon /> :

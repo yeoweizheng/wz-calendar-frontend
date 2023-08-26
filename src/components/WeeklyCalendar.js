@@ -22,7 +22,6 @@ import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
 import { useSnackbar } from '../services/snackbar';
 import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
-import { nanoid } from 'nanoid';
 
 export default function WeeklyCalendar() {
 
@@ -180,7 +179,7 @@ export default function WeeklyCalendar() {
       </Stack>
       <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>
         {displayData.map((data) => (
-          <React.Fragment key={nanoid()}>
+          <React.Fragment key={data.date}>
             <Grid item xs={3} sm={3} md={3} sx={getSameDayStyle(data.date)}>
               <Box sx={{ p: 1 }}>
                 <Typography variant="body2" component="p" align="center" fontWeight="medium">{format(data.date, "d MMM")}</Typography>
@@ -190,7 +189,7 @@ export default function WeeklyCalendar() {
             <Grid item xs={8} sm={8} md={8} sx={getSameDayStyle(data.date)}>
               <Box sx={{ p: 1 }}>
                 {data.items.map((item) => (
-                  <React.Fragment key={nanoid()}>
+                  <React.Fragment key={item.id}>
                     <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
                   </React.Fragment>
                 ))}

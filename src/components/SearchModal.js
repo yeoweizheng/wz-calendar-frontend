@@ -10,7 +10,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { format, parse } from 'date-fns';
-import { nanoid } from 'nanoid';
 
 
 export default function SearchModal(props) {
@@ -61,7 +60,7 @@ export default function SearchModal(props) {
         </Stack>
         <List>
           {searchItems.map((item) => (
-            <ListItem key={nanoid()} disablePadding>
+            <ListItem key={item.id} disablePadding>
               <ListItemButton sx={{pr: 0}} onClick={() => handleSearchItemClick(item)}>
                 <ListItemText primary={format(parse(item.date, "yyyy-MM-dd", new Date()), "d MMM yy (E)") + " - " + item.name} />
               </ListItemButton>

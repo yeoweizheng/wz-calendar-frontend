@@ -18,7 +18,6 @@ import { useSwipeable } from 'react-swipeable';
 import Button from '@mui/material/Button';
 import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
-import { nanoid } from 'nanoid';
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
@@ -161,18 +160,18 @@ export default function MonthlyCalendar() {
       </Stack>
       <Grid container justifyContent="space-evenly">
         {getDaysInWeek().map((day) => (
-          <Grid item sx={{flex: 1, border: 1, borderColor: "grey.300", py: 0.5}} key={nanoid()}>
+          <Grid item sx={{flex: 1, border: 1, borderColor: "grey.300", py: 0.5}} key={day}>
             <Typography variant="body2" component="p" align="center" fontWeight="medium">{day}</Typography>
           </Grid>
         ))}
       </Grid>
       {displayData.map((weekData) => (
-        <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={nanoid()}>
+        <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].day+"-week"}>
           {weekData.map((dayData) => (
-            <Grid item zeroMinWidth sx={getDayStyle(dayData.date)} onClick={() => gotoWeek(dayData.date)} key={nanoid()}>
+            <Grid item zeroMinWidth sx={getDayStyle(dayData.date)} onClick={() => gotoWeek(dayData.date)} key={dayData.day}>
               <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
               {dayData.items.map((item) => (
-                <React.Fragment key={nanoid()}>
+                <React.Fragment key={item.id}>
                   <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name}</Typography>
                 </React.Fragment>
               ))}
