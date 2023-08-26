@@ -16,6 +16,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import { nanoid } from 'nanoid';
 
 export default function TagModal(props) {
   const [name, setName] = React.useState("");
@@ -109,7 +110,7 @@ export default function TagModal(props) {
                   >
                   {globalData.tags.map((tag) => (
                     tag.id !== "a" && tag.id !== "u"?
-                    <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
+                    <MenuItem key={nanoid()} value={tag.id}>{tag.name}</MenuItem> : null
                   ))}
                 </Select>
               </FormControl>

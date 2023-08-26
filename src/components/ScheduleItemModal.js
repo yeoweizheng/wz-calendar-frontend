@@ -24,6 +24,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { format } from 'date-fns';
 import { InputAdornment } from '@mui/material';
 import { useSnackbar } from '../services/snackbar';
+import { nanoid } from 'nanoid';
 
 export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
@@ -152,7 +153,7 @@ export default function ScheduleItemModal(props) {
               >
               {globalData.tags.map((tag) => (
                 tag.id !== "a"?
-                <MenuItem key={tag.id} value={tag.id}>{tag.name}</MenuItem> : null
+                <MenuItem key={nanoid()} value={tag.id}>{tag.name}</MenuItem> : null
               ))}
             </Select>
           </FormControl>
