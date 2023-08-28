@@ -123,7 +123,8 @@ export default function MonthlyCalendar() {
 
   const getDayStyle = React.useCallback((date) => {
     return {flex: 1, border: 1, borderColor: "grey.300", px: 0.5, backgroundColor: isSameDay(date, today.current)? "LightYellow": isSameMonth(date, globalData.selectedDate)? "White":"grey.200"}
-  }, [today, globalData.selectedDate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today, displayData]);
 
   React.useEffect(() => {
     retrieveScheduleItems(globalData.selectedDate);
