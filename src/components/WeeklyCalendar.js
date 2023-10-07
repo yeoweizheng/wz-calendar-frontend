@@ -195,7 +195,7 @@ export default function WeeklyCalendar() {
           <IconButton color="primary" onClick={gotoNextWeek}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Swiper loop={true} preventClicks={false} preventClicksPropagation={false}
+      <Swiper loop={true} preventClicks={false} preventClicksPropagation={false} touchStartPreventDefault={false}
         onSlideNextTransitionStart={handleSlideNext} onSlidePrevTransitionStart={handleSlidePrev}
         onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0,1,2].map((slideIndex) => (
