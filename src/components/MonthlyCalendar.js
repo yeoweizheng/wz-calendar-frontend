@@ -31,14 +31,28 @@ export default function MonthlyCalendar() {
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderMonthPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const [loading, setLoading] = React.useState(false);
-  const [slideIndex, setSlideIndex] = React.useState(0);
+  const slideIndex = React.useRef(0);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
   const swiperDestroyed = React.useRef(false);
+  const selectedDateRef = React.useRef(globalData.selectedDate);
+  const scheduleItems = React.useRef([]);
 
-  const handleRetrieveScheduleItems = React.useCallback((items) => {
+  const handleRetrieveScheduleItems = React.useCallback((items=[]) => {
+    let oldItems = scheduleItems.current;
+    scheduleItems.current = items;
     let data = [];
     let itemMapping = {};
+    let itemIds = [];
+    for (let item of oldItems) {
+      if (item.date in itemMapping) {
+        itemMapping[item.date].push(item);
+      } else {
+        itemMapping[item.date] = [item];
+      }
+      itemIds.push(item.id);
+    }
     for (let item of items) {
+      if (itemIds.includes(item.id)) continue;
       if (item.date in itemMapping) {
         itemMapping[item.date].push(item);
       } else {
@@ -47,16 +61,16 @@ export default function MonthlyCalendar() {
     }
     let col = 0;
     let row = 0;
-    for (let date of getDateObjIn3Months(globalData.selectedDate)) {
+    for (let date of getDateObjIn3Months(selectedDateRef.current)) {
       let slideIndices = [];
-      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(sub(globalData.selectedDate, {months: 1}))), end: endOfWeek(endOfMonth(sub(globalData.selectedDate, {months: 1})))})){
-        slideIndices.push(getPrevSlideIndex(slideIndex));
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(sub(selectedDateRef.current, {months: 1}))), end: endOfWeek(endOfMonth(sub(selectedDateRef.current, {months: 1})))})){
+        slideIndices.push(getPrevSlideIndex(slideIndex.current));
       }
-      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(globalData.selectedDate)), end: endOfWeek(endOfMonth(globalData.selectedDate))})){
-        slideIndices.push(slideIndex);
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(selectedDateRef.current)), end: endOfWeek(endOfMonth(selectedDateRef.current))})){
+        slideIndices.push(slideIndex.current);
       }
-      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(add(globalData.selectedDate, {months: 1}))), end: endOfWeek(endOfMonth(add(globalData.selectedDate, {months: 1})))})){
-        slideIndices.push(getNextSlideIndex(slideIndex));
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(add(selectedDateRef.current, {months: 1}))), end: endOfWeek(endOfMonth(add(selectedDateRef.current, {months: 1})))})){
+        slideIndices.push(getNextSlideIndex(slideIndex.current));
       }
       if (col === 0) data.push([]);
       let dateStr = format(date, "yyyy-MM-dd");
@@ -71,7 +85,7 @@ export default function MonthlyCalendar() {
     }
     setDisplayData(data);
     setLoading(false);
-  }, [getDateObjIn3Months, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex]);
+  }, [getDateObjIn3Months, selectedDateRef, slideIndex, getPrevSlideIndex, getNextSlideIndex, scheduleItems]);
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     setLoading(true);
@@ -84,26 +98,32 @@ export default function MonthlyCalendar() {
   }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const gotoNextMonth = React.useCallback(() => {
-    const newDate = add(startOfMonth(globalData.selectedDate), {"months": 1})
-    setTimeout(() =>setSelectedDateForAll(newDate), 0);
-  }, [setSelectedDateForAll, globalData.selectedDate])
+    const newDate = add(startOfMonth(selectedDateRef.current), {"months": 1})
+    setTimeout(() => {
+      setSelectedDateForAll(newDate, selectedDateRef);
+      handleRetrieveScheduleItems()
+    }, 0);
+  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
   const gotoPrevMonth = React.useCallback(() => {
-    const newDate = sub(startOfMonth(globalData.selectedDate), {"months": 1})
-    setTimeout(() => setSelectedDateForAll(newDate), 0);
-  }, [setSelectedDateForAll, globalData.selectedDate])
+    const newDate = sub(startOfMonth(selectedDateRef.current), {"months": 1})
+    setTimeout(() => {
+      setSelectedDateForAll(newDate, selectedDateRef);
+      handleRetrieveScheduleItems()
+    }, 0);
+  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
+    slideIndex.current = swiper.realIndex;
     gotoNextMonth()
-    setSlideIndex(swiper.realIndex);
-  }, [setSlideIndex, gotoNextMonth, swiperDestroyed])
+  }, [slideIndex, gotoNextMonth, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
+    slideIndex.current = swiper.realIndex;
     gotoPrevMonth();
-    setSlideIndex(swiper.realIndex);
-  }, [setSlideIndex, gotoPrevMonth, swiperDestroyed])
+  }, [gotoPrevMonth, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -115,16 +135,16 @@ export default function MonthlyCalendar() {
   }, [gotoPrevMonth, gotoNextMonth, loading, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
 
   const gotoWeek = React.useCallback((date) => {
-    if (!isSameMonth(globalData.selectedDate, date)) {
-      if (isBefore(date, globalData.selectedDate)) {
+    if (!isSameMonth(selectedDateRef.current, date)) {
+      if (isBefore(date, selectedDateRef.current)) {
         date = endOfWeek(date);
       } else {
         date = startOfWeek(date);
       }
     }
-    setSelectedDateForAll(date);
+    setSelectedDateForAll(date, selectedDateRef);
     setGlobalData((prev) => ({...prev, calView: "weekly"}))
-  }, [setSelectedDateForAll, setGlobalData, globalData.selectedDate]);
+  }, [setSelectedDateForAll, setGlobalData, selectedDateRef]);
 
   const getItemStyle = React.useCallback((item) => {
     let baseCSS = {display: "block", lineHeight: "1.2em", color: "white", borderRadius: "3px", my: 0.2, px: 0.2, py: 0.1}
@@ -141,9 +161,9 @@ export default function MonthlyCalendar() {
     if (isSameDay(date, today.current)){
       style.backgroundColor = "LightYellow";
     } else if (slideIndices.length === 1) {
-      if (currIndex === getPrevSlideIndex(slideIndex) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // start-of-month for prev slide
+      if (currIndex === getPrevSlideIndex(slideIndex.current) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // start-of-month for prev slide
         style.backgroundColor = isSameMonth(date, endOfWeek(date)) ? "White":"grey.300";
-      } else if (currIndex === getNextSlideIndex(slideIndex) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // end-of-month for next slide
+      } else if (currIndex === getNextSlideIndex(slideIndex.current) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // end-of-month for next slide
         style.backgroundColor = isSameMonth(date, startOfWeek(date)) ? "White":"grey.300";
       } else {
         style.backgroundColor = "White";
@@ -183,10 +203,10 @@ export default function MonthlyCalendar() {
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={gotoPrevMonth}><ArrowBackIcon /></IconButton>
           <MobileDatePicker
-            value={globalData.selectedDate}
+            value={selectedDateRef.current}
             label="Select month"
             onChange={(value) => {setCustomDayValue(value)}}
-            onAccept={(value) => {setSelectedDateForAll(value)}}
+            onAccept={(value) => {setSelectedDateForAll(value, selectedDateRef); handleRetrieveScheduleItems();}}
             onOpen={() => setDatePickerOpen(true)}
             onClose={() => setDatePickerOpen(false)}
             renderDay={renderMonthPickerDay}
@@ -229,8 +249,8 @@ export default function MonthlyCalendar() {
             { showCurrentMonthButton(slideIndex) ?
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
-                  onTouchStart={() => setSelectedDateForAll(today.current)}
-                  onClick={() => setSelectedDateForAll(today.current)}
+                  onTouchStart={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
+                  onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
                   >Current month</Button>
               </Stack> : null
             }
