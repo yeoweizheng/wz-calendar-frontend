@@ -242,7 +242,6 @@ export default function MonthlyCalendar() {
             { showCurrentMonthButton(slideIndex) ?
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
-                  onTouchStart={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
                   onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
                   >Current month</Button>
               </Stack> : null
