@@ -39,7 +39,7 @@ export default function MonthlyCalendar() {
 
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
     let oldItems = replace? [] : scheduleItems.current;
-    scheduleItems.current = items.length > 0 ? items : scheduleItems.current;
+    scheduleItems.current = replace? items : scheduleItems.current;
     let data = [];
     let itemMapping = {};
     let itemIds = [];

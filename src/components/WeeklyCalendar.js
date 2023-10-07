@@ -47,7 +47,7 @@ export default function WeeklyCalendar() {
 
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
     let oldItems = replace? [] : scheduleItems.current;
-    scheduleItems.current = items.length > 0 ? items : scheduleItems.current;
+    scheduleItems.current = replace? items : scheduleItems.current;
     const dates = getDateObjIn3Weeks(selectedDateRef.current);
     let data = [];
     let itemMapping = {};
