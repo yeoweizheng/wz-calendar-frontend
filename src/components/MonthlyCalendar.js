@@ -34,6 +34,7 @@ export default function MonthlyCalendar() {
   const [slideIndex, setSlideIndex] = React.useState(0);
   const [slideTransitioning, setSlideTransitioning] = React.useState(false);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
+  const swiperDestroyed = React.useRef(false);
 
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     let data = [];
@@ -95,18 +96,20 @@ export default function MonthlyCalendar() {
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleSlideNext = React.useCallback((swiper) => {
+    if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoNextMonth()
     setSlideIndex(getNextSlideIndex(slideIndex));
     setSlideTransitioning(false);
-  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextMonth, setSlideTransitioning])
+  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextMonth, setSlideTransitioning, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
+    if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoPrevMonth();
     setSlideIndex(getPrevSlideIndex(slideIndex));
     setSlideTransitioning(false);
-  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevMonth, setSlideTransitioning])
+  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevMonth, setSlideTransitioning, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -202,7 +205,9 @@ export default function MonthlyCalendar() {
           <IconButton color="primary" onClick={gotoNextMonth}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Swiper loop={true} onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}>
+      <Swiper loop={true} 
+        onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev} 
+        onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0, 1, 2].map((slideIndex) => (
           <SwiperSlide key={"slide"+slideIndex}>
             <Grid container justifyContent="space-evenly">
@@ -213,7 +218,7 @@ export default function MonthlyCalendar() {
               ))}
             </Grid>
             {displayData.filter((weekData) => weekData[0].slideIndices.includes(slideIndex)).map((weekData) => (
-              <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].date}>
+              <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={"week-"+weekData[0].date}>
                 {weekData.map((dayData) => (
                   <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}>
                     <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>

@@ -41,6 +41,7 @@ export default function WeeklyCalendar() {
   const [slideIndex, setSlideIndex] = React.useState(0);
   const [slideTransitioning, setSlideTransitioning] = React.useState(false);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
+  const swiperDestroyed = React.useRef(false);
   let scheduleItems = React.useRef([]);
 
   const gotoNextWeek = React.useCallback(() => {
@@ -103,18 +104,20 @@ export default function WeeklyCalendar() {
   }, [get, get3WeeksStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId, slideTransitioning]);
 
   const handleSlideNext = React.useCallback((swiper) => {
+    if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoNextWeek();
     setSlideIndex(getNextSlideIndex(slideIndex));
     setSlideTransitioning(false);
-  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextWeek, setSlideTransitioning])
+  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextWeek, setSlideTransitioning, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
+    if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoPrevWeek();
     setSlideIndex(getPrevSlideIndex(slideIndex));
     setSlideTransitioning(false);
-  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevWeek, setSlideTransitioning])
+  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevWeek, setSlideTransitioning, swiperDestroyed])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -164,7 +167,7 @@ export default function WeeklyCalendar() {
   }, [today, displayData]);
 
   React.useEffect(() => {
-    if (!modalOpen) retrieveScheduleItems(globalData.selectedDate, true);
+    if (!modalOpen) retrieveScheduleItems(globalData.selectedDate);
   }, [retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
@@ -197,7 +200,9 @@ export default function WeeklyCalendar() {
           <IconButton color="primary" onClick={gotoNextWeek}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Swiper loop={true} onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}>
+      <Swiper loop={true} 
+        onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}
+        onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0,1,2].map((slideIndex) => (
           <SwiperSlide key={slideIndex}>
             <Grid container sx={{mt: 1, border: 0.5, borderColor: "grey.500"}}>
