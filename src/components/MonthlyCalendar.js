@@ -20,7 +20,6 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useSlide } from '../services/slide';
 
-
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
   const {getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek} = useCalendar();
@@ -74,7 +73,7 @@ export default function MonthlyCalendar() {
     }
     setDisplayData(data);
     setLoading(false);
-  }, [getDateObjIn3Months, selectedDateRef, slideIndex, getPrevSlideIndex, getNextSlideIndex, scheduleItems]);
+  }, [getDateObjIn3Months, getPrevSlideIndex, getNextSlideIndex, scheduleItems]);
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     setLoading(true);
@@ -92,7 +91,7 @@ export default function MonthlyCalendar() {
       setSelectedDateForAll(newDate, selectedDateRef);
       handleRetrieveScheduleItems()
     }, delay);
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+  }, [setSelectedDateForAll, handleRetrieveScheduleItems])
 
   const gotoPrevMonth = React.useCallback((delay=0) => {
     const newDate = sub(startOfMonth(selectedDateRef.current), {"months": 1})
@@ -100,19 +99,19 @@ export default function MonthlyCalendar() {
       setSelectedDateForAll(newDate, selectedDateRef);
       handleRetrieveScheduleItems()
     }, delay);
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+  }, [setSelectedDateForAll, handleRetrieveScheduleItems])
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
     gotoNextMonth(50)
-  }, [slideIndex, gotoNextMonth, swiperDestroyed])
+  }, [gotoNextMonth])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
     gotoPrevMonth(50);
-  }, [gotoPrevMonth, swiperDestroyed])
+  }, [gotoPrevMonth])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -133,7 +132,7 @@ export default function MonthlyCalendar() {
     }
     setSelectedDateForAll(date, selectedDateRef);
     setGlobalData((prev) => ({...prev, calView: "weekly"}))
-  }, [setSelectedDateForAll, setGlobalData, selectedDateRef]);
+  }, [setSelectedDateForAll, setGlobalData]);
 
   const getItemStyle = React.useCallback((item) => {
     let baseCSS = {display: "block", lineHeight: "1.2em", color: "white", borderRadius: "3px", my: 0.2, px: 0.2, py: 0.1}
@@ -178,8 +177,7 @@ export default function MonthlyCalendar() {
   React.useEffect(() => {
     if (!isSameDay(selectedDateRef.current, globalData.selectedDate)) selectedDateRef.current = globalData.selectedDate;
     retrieveScheduleItems(globalData.selectedDate);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
+  }, [retrieveScheduleItems, globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);

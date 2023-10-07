@@ -44,7 +44,6 @@ export default function WeeklyCalendar() {
   const selectedDateRef = React.useRef(globalData.selectedDate);
   const scheduleItems = React.useRef([]);
 
-
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
     scheduleItems.current = replace? items : scheduleItems.current;
     const dates = getDateObjIn3Weeks(selectedDateRef.current);
@@ -72,7 +71,7 @@ export default function WeeklyCalendar() {
     }
     setLoading(false);
     setDisplayData(data);
-  }, [getDateObjIn3Weeks, selectedDateRef, slideIndex, getPrevSlideIndex, getNextSlideIndex])
+  }, [getDateObjIn3Weeks, getPrevSlideIndex, getNextSlideIndex])
 
   const gotoNextWeek = React.useCallback((delay=0) => {
     const newDate = add(selectedDateRef.current, {"weeks": 1})
@@ -80,7 +79,7 @@ export default function WeeklyCalendar() {
       setSelectedDateForAll(newDate, selectedDateRef)
       handleRetrieveScheduleItems();
     }, delay)
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+  }, [setSelectedDateForAll, handleRetrieveScheduleItems])
 
   const gotoPrevWeek = React.useCallback((delay=0) => {
     const newDate = sub(selectedDateRef.current, {"weeks": 1})
@@ -88,7 +87,7 @@ export default function WeeklyCalendar() {
       setSelectedDateForAll(newDate, selectedDateRef)
       handleRetrieveScheduleItems();
     }, delay);
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+  }, [setSelectedDateForAll, handleRetrieveScheduleItems])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -113,13 +112,13 @@ export default function WeeklyCalendar() {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
     gotoNextWeek(50);
-  }, [slideIndex, gotoNextWeek, swiperDestroyed])
+  }, [gotoNextWeek])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
     gotoPrevWeek(50);
-  }, [slideIndex, gotoPrevWeek, swiperDestroyed])
+  }, [gotoPrevWeek])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -171,14 +170,12 @@ export default function WeeklyCalendar() {
   React.useEffect(() => {
     if (!isSameDay(selectedDateRef.current, globalData.selectedDate)) selectedDateRef.current = globalData.selectedDate;
     if (!modalOpen) retrieveScheduleItems(globalData.selectedDate);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalData.selectedDate, selectedDateRef, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
+  }, [retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
     return () => { window.document.removeEventListener('keyup', handleKeyUp); }
   }, [handleKeyUp]);
-
 
   return (
     <Container maxWidth="md" sx={{p: "0 !important", overflowX: "hidden"}}>
