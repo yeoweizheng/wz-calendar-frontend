@@ -43,21 +43,14 @@ export default function MonthlyCalendar() {
     let data = [];
     let itemMapping = {};
     let itemIds = [];
-    for (let item of oldItems) {
-      if (item.date in itemMapping) {
-        itemMapping[item.date].push(item);
-      } else {
-        itemMapping[item.date] = [item];
-      }
-      itemIds.push(item.id);
-    }
-    for (let item of items) {
+    for (let item of oldItems.concat(items)) {
       if (itemIds.includes(item.id)) continue;
       if (item.date in itemMapping) {
         itemMapping[item.date].push(item);
       } else {
         itemMapping[item.date] = [item];
       }
+      itemIds.push(item.id);
     }
     let col = 0;
     let row = 0;
