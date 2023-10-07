@@ -97,32 +97,32 @@ export default function MonthlyCalendar() {
     get(url, handleRetrieveScheduleItems);
   }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
-  const gotoNextMonth = React.useCallback(() => {
+  const gotoNextMonth = React.useCallback((delay=0) => {
     const newDate = add(startOfMonth(selectedDateRef.current), {"months": 1})
     setTimeout(() => {
       setSelectedDateForAll(newDate, selectedDateRef);
       handleRetrieveScheduleItems()
-    }, 0);
+    }, delay);
   }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
-  const gotoPrevMonth = React.useCallback(() => {
+  const gotoPrevMonth = React.useCallback((delay=0) => {
     const newDate = sub(startOfMonth(selectedDateRef.current), {"months": 1})
     setTimeout(() => {
       setSelectedDateForAll(newDate, selectedDateRef);
       handleRetrieveScheduleItems()
-    }, 0);
+    }, delay);
   }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoNextMonth()
+    gotoNextMonth(300)
   }, [slideIndex, gotoNextMonth, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoPrevMonth();
+    gotoPrevMonth(300);
   }, [gotoPrevMonth, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {

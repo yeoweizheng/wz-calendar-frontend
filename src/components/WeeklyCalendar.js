@@ -85,20 +85,20 @@ export default function WeeklyCalendar() {
     setDisplayData(data);
   }, [getDateObjIn3Weeks, selectedDateRef, slideIndex, getPrevSlideIndex, getNextSlideIndex])
 
-  const gotoNextWeek = React.useCallback(() => {
+  const gotoNextWeek = React.useCallback((delay=0) => {
     const newDate = add(selectedDateRef.current, {"weeks": 1})
     setTimeout(() => {
       setSelectedDateForAll(newDate, selectedDateRef)
       handleRetrieveScheduleItems();
-    }, 0)
+    }, delay)
   }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
-  const gotoPrevWeek = React.useCallback(() => {
+  const gotoPrevWeek = React.useCallback((delay=0) => {
     const newDate = sub(selectedDateRef.current, {"weeks": 1})
     setTimeout(() => {
       setSelectedDateForAll(newDate, selectedDateRef)
       handleRetrieveScheduleItems();
-    }, 0);
+    }, delay);
   }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
 
   const handleKeyUp = React.useCallback((e) => {
@@ -123,13 +123,13 @@ export default function WeeklyCalendar() {
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoNextWeek();
+    gotoNextWeek(300);
   }, [slideIndex, gotoNextWeek, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoPrevWeek();
+    gotoPrevWeek(300);
   }, [slideIndex, gotoPrevWeek, swiperDestroyed])
 
   const openModal = (id, date) => {
