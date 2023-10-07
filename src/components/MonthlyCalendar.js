@@ -200,7 +200,7 @@ export default function MonthlyCalendar() {
           <IconButton color="primary" onClick={gotoNextMonth}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Swiper loop={true} preventClicks={false}
+      <Swiper loop={true} preventClicks={false} preventClicksPropagation={false}
         onSlideNextTransitionStart={handleSlideNext} onSlidePrevTransitionStart={handleSlidePrev} 
         onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0, 1, 2].map((slideIndex) => (
@@ -228,7 +228,10 @@ export default function MonthlyCalendar() {
             ))}
             { showCurrentMonthButton(slideIndex) ?
               <Stack alignItems="center">
-                <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current month</Button>
+                <Button variant="outlined" size="small" sx={{mt: 1}} 
+                  onTouchStart={() => setSelectedDateForAll(today.current)}
+                  onClick={() => setSelectedDateForAll(today.current)}
+                  >Current month</Button>
               </Stack> : null
             }
           </SwiperSlide>
