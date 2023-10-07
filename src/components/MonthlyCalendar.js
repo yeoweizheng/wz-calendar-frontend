@@ -2,7 +2,7 @@ import * as React from 'react';
 import Container from '@mui/material/Container';
 import { useGlobalData } from '../services/globalData';
 import { useCalendar } from '../services/calendar';
-import { format, isSameDay, add, sub, startOfMonth, isSameMonth, isBefore, startOfWeek, endOfWeek } from 'date-fns';
+import { format, isSameDay, add, sub, startOfMonth, isSameMonth, isBefore, startOfWeek, endOfWeek, isWithinInterval, endOfMonth } from 'date-fns';
 import { useHttp } from '../services/http';
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
@@ -14,14 +14,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useCustomDay } from '../services/customday';
-import { useSwipeable } from 'react-swipeable';
 import Button from '@mui/material/Button';
 import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { useSlide } from '../services/slide';
+
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
-  const {getDateObjInMonth, getMonthStartEndDateObj, getDaysInWeek} = useCalendar();
+  const {getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek} = useCalendar();
   const [displayData, setDisplayData] = React.useState([]);
   const { get } = useHttp();
   const theme = useTheme();
@@ -29,6 +31,9 @@ export default function MonthlyCalendar() {
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderMonthPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const [loading, setLoading] = React.useState(false);
+  const [slideIndex, setSlideIndex] = React.useState(0);
+  const [slideTransitioning, setSlideTransitioning] = React.useState(false);
+  const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
 
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     let data = [];
@@ -42,30 +47,42 @@ export default function MonthlyCalendar() {
     }
     let col = 0;
     let row = 0;
-    for (let date of getDateObjInMonth(globalData.selectedDate)) {
+    for (let date of getDateObjIn3Months(globalData.selectedDate)) {
+      let slideIndices = [];
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(sub(globalData.selectedDate, {months: 1}))), end: endOfWeek(endOfMonth(sub(globalData.selectedDate, {months: 1})))})){
+        slideIndices.push(getPrevSlideIndex(slideIndex));
+      }
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(globalData.selectedDate)), end: endOfWeek(endOfMonth(globalData.selectedDate))})){
+        slideIndices.push(slideIndex);
+      }
+      if (isWithinInterval(date, {start: startOfWeek(startOfMonth(add(globalData.selectedDate, {months: 1}))), end: endOfWeek(endOfMonth(add(globalData.selectedDate, {months: 1})))})){
+        slideIndices.push(getNextSlideIndex(slideIndex));
+      }
       if (col === 0) data.push([]);
       let dateStr = format(date, "yyyy-MM-dd");
       data[row].push({
         "date": date,
         "day": format(date, "d"),
-        "items": dateStr in itemMapping? itemMapping[dateStr] : []
+        "items": dateStr in itemMapping? itemMapping[dateStr] : [],
+        "slideIndices": slideIndices,
       })
       col += 1;
       if (col === 7) { col = 0; row += 1; }
     }
     setDisplayData(data);
     setLoading(false);
-  }, [getDateObjInMonth, globalData.selectedDate]);
+  }, [getDateObjIn3Months, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex]);
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
+    if (slideTransitioning) return;
     setLoading(true);
-    const [startDateObj, endDateObj] = getMonthStartEndDateObj(selectedDate);
+    const [startDateObj, endDateObj] = get3MonthsStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
     if (globalData.selectedTagId !== "a") {
       url += "&tag=" + globalData.selectedTagId
     }
     get(url, handleRetrieveScheduleItems);
-  }, [get, getMonthStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
+  }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId, slideTransitioning]);
 
   const gotoNextMonth = React.useCallback(() => {
     const newDate = add(startOfMonth(globalData.selectedDate), {"months": 1})
@@ -76,6 +93,20 @@ export default function MonthlyCalendar() {
     const newDate = sub(startOfMonth(globalData.selectedDate), {"months": 1})
     setSelectedDateForAll(newDate);
   }, [setSelectedDateForAll, globalData.selectedDate])
+
+  const handleSlideNext = React.useCallback((swiper) => {
+    setSlideTransitioning(true);
+    gotoNextMonth()
+    setSlideIndex(getNextSlideIndex(slideIndex));
+    setSlideTransitioning(false);
+  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextMonth, setSlideTransitioning])
+
+  const handleSlidePrev = React.useCallback((swiper) => {
+    setSlideTransitioning(true);
+    gotoPrevMonth();
+    setSlideIndex(getPrevSlideIndex(slideIndex));
+    setSlideTransitioning(false);
+  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevMonth, setSlideTransitioning])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -98,19 +129,6 @@ export default function MonthlyCalendar() {
     setGlobalData((prev) => ({...prev, calView: "weekly"}))
   }, [setSelectedDateForAll, setGlobalData, globalData.selectedDate]);
 
-  const swipeHandler = useSwipeable({
-    onSwiped: (e) => handleSwipe(e)
-  })
-
-  const handleSwipe = React.useCallback((e) => {
-    if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
-    if (e.dir === "Left") {
-      gotoNextMonth();
-    } else if (e.dir === "Right") {
-      gotoPrevMonth();
-    }
-  }, [gotoPrevMonth, gotoNextMonth, loading, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
-
   const getItemStyle = React.useCallback((item) => {
     let baseCSS = {display: "block", lineHeight: "1.2em", color: "white", borderRadius: "3px", my: 0.2, px: 0.2, py: 0.1}
     if (item.done) {
@@ -121,9 +139,34 @@ export default function MonthlyCalendar() {
     return baseCSS;
   }, [theme.palette]);
 
-  const getDayStyle = React.useCallback((date) => {
-    return {flex: 1, border: 1, borderColor: "grey.300", px: 0.5, backgroundColor: isSameDay(date, today.current)? "LightYellow": isSameMonth(date, globalData.selectedDate)? "White":"grey.200"}
+  const getDayStyle = React.useCallback((date, slideIndices, currIndex) => {
+    let style = {flex: 1, border: 0.5, borderColor: "grey.500", px: 0.5}
+    if (isSameDay(date, today.current)){
+      style.backgroundColor = "LightYellow";
+    } else if (slideIndices.length === 1) {
+      if (currIndex === getPrevSlideIndex(slideIndex) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // start-of-month for prev slide
+        style.backgroundColor = isSameMonth(date, endOfWeek(date)) ? "White":"grey.300";
+      } else if (currIndex === getNextSlideIndex(slideIndex) && !isSameMonth(startOfWeek(date), endOfWeek(date))) {  // end-of-month for next slide
+        style.backgroundColor = isSameMonth(date, startOfWeek(date)) ? "White":"grey.300";
+      } else {
+        style.backgroundColor = "White";
+      }
+    } else {
+      if (slideIndices.indexOf(currIndex) === 0) {  // end-of-month
+        style.backgroundColor = isSameMonth(date, startOfWeek(date)) ? "White":"grey.300";
+      } else if (slideIndices.indexOf(currIndex) === 1) {  // start-of-month
+        style.backgroundColor = isSameMonth(date, endOfWeek(date)) ? "White":"grey.300";
+      }
+    }
+    return style;
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [today, displayData, getPrevSlideIndex, getNextSlideIndex]);
+
+  const showCurrentMonthButton = React.useCallback((currIndex) => {
+    if (displayData.length === 0) return false;
+    let filteredData = displayData.filter(((weekData) => weekData[0].slideIndices.includes(currIndex)))
+    if (isSameMonth(endOfWeek(filteredData[0][0].date), today.current)) return false;
+    return true;
   }, [today, displayData]);
 
   React.useEffect(() => {
@@ -136,7 +179,7 @@ export default function MonthlyCalendar() {
   }, [handleKeyUp]);
 
   return (
-    <Container sx={{p: 0}} {...swipeHandler}>
+    <Container sx={{p: 0}}>
       <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center" sx={{mb: 1}}>
         <Stack direction="row" sx={{pt: 2}}>
@@ -159,32 +202,38 @@ export default function MonthlyCalendar() {
           <IconButton color="primary" onClick={gotoNextMonth}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Grid container justifyContent="space-evenly">
-        {getDaysInWeek().map((day) => (
-          <Grid item sx={{flex: 1, border: 1, borderColor: "grey.300", py: 0.5}} key={day}>
-            <Typography variant="body2" component="p" align="center" fontWeight="medium">{day}</Typography>
-          </Grid>
-        ))}
-      </Grid>
-      {displayData.map((weekData) => (
-        <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].date}>
-          {weekData.map((dayData) => (
-            <Grid item zeroMinWidth sx={getDayStyle(dayData.date)} onClick={() => gotoWeek(dayData.date)} key={dayData.day}>
-              <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
-              {dayData.items.map((item) => (
-                <React.Fragment key={item.id}>
-                  <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name}</Typography>
-                </React.Fragment>
+      <Swiper loop={true} onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}>
+        {[0, 1, 2].map((slideIndex) => (
+          <SwiperSlide key={"slide"+slideIndex}>
+            <Grid container justifyContent="space-evenly">
+              {getDaysInWeek().map((day) => (
+                <Grid item sx={{flex: 1, border: 0.5, borderTop: 1, borderColor: "grey.500", py: 0.5}} key={slideIndex+"-header-"+day}>
+                  <Typography variant="body2" component="p" align="center" fontWeight="medium">{day}</Typography>
+                </Grid>
               ))}
             </Grid>
-          ))}
-        </Grid>
-      ))}
-      { isSameMonth(globalData.selectedDate, today.current) ? null :
-        <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current month</Button>
-        </Stack>
-      }
+            {displayData.filter((weekData) => weekData[0].slideIndices.includes(slideIndex)).map((weekData) => (
+              <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={weekData[0].date}>
+                {weekData.map((dayData) => (
+                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}>
+                    <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
+                    {dayData.items.map((item) => (
+                      <React.Fragment key={item.id}>
+                        <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name}</Typography>
+                      </React.Fragment>
+                    ))}
+                  </Grid>
+                ))}
+              </Grid>
+            ))}
+            { showCurrentMonthButton(slideIndex) ?
+              <Stack alignItems="center">
+                <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current month</Button>
+              </Stack> : null
+            }
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </Container>
   )
 }

@@ -8,7 +8,6 @@ import { useCalendar } from '../services/calendar';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
 import Stack from '@mui/material/Stack';
 import { useHttp } from '../services/http';
-import { useSwipeable } from 'react-swipeable';
 import ScheduleItemModal from './ScheduleItemModal';
 import IconButton from '@mui/material/IconButton';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -18,14 +17,16 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useGlobalData } from '../services/globalData';
 import { useCustomDay } from '../services/customday';
-import { add, sub, format, isSameDay, isSameWeek, parse } from 'date-fns';
+import { add, sub, format, isSameDay, parse } from 'date-fns';
 import { useSnackbar } from '../services/snackbar';
 import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { useSlide } from '../services/slide';
 
 export default function WeeklyCalendar() {
 
-  const { getDateObjInWeek, getStartEndDateObj } = useCalendar();
+  const { getDateObjIn3Weeks, get3WeeksStartEndDateObj } = useCalendar();
   const { get } = useHttp();
   const [globalData,] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
@@ -37,6 +38,9 @@ export default function WeeklyCalendar() {
   const {renderWeekPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const {openSnackbar} = useSnackbar();
   const [loading, setLoading] = React.useState(false);
+  const [slideIndex, setSlideIndex] = React.useState(0);
+  const [slideTransitioning, setSlideTransitioning] = React.useState(false);
+  const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
   let scheduleItems = React.useRef([]);
 
   const gotoNextWeek = React.useCallback(() => {
@@ -49,19 +53,6 @@ export default function WeeklyCalendar() {
     setSelectedDateForAll(newDate);
   }, [setSelectedDateForAll, globalData.selectedDate])
 
-  const handleSwipe = React.useCallback((e) => {
-    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
-    if (e.dir === "Left") {
-      gotoNextWeek();
-    } else if (e.dir === "Right") {
-      gotoPrevWeek();
-    }
-  }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
-
-  const swipeHandler = useSwipeable({
-    onSwiped: (e) => handleSwipe(e)
-  })
-
   const handleKeyUp = React.useCallback((e) => {
     if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
     if (e.keyCode === 37) {
@@ -73,7 +64,7 @@ export default function WeeklyCalendar() {
 
   const handleRetrieveScheduleItems = React.useCallback((items) => {
     scheduleItems.current = items;
-    const dates = getDateObjInWeek(globalData.selectedDate);
+    const dates = getDateObjIn3Weeks(globalData.selectedDate);
     let data = [];
     let itemMapping = {};
     for (let item of items) {
@@ -83,27 +74,47 @@ export default function WeeklyCalendar() {
         itemMapping[item.date] = [item];
       }
     }
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 21; i++) {
       let dateStr = format(dates[i], "yyyy-MM-dd");
+      let dataSlideIndex;
+      if (i < 7) dataSlideIndex = getPrevSlideIndex(slideIndex);
+      if (i >= 7 && i < 14) dataSlideIndex = slideIndex;
+      if (i >= 14) dataSlideIndex = getNextSlideIndex(slideIndex);
       data.push({
         "date": dates[i],
         "day": format(dates[i], "E"),
-        "items": dateStr in itemMapping? itemMapping[dateStr] : []
+        "items": dateStr in itemMapping? itemMapping[dateStr] : [],
+        "slideIndex": dataSlideIndex
       });
     }
     setLoading(false);
     setDisplayData(data);
-  }, [getDateObjInWeek, globalData.selectedDate])
+  }, [getDateObjIn3Weeks, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
+    if (slideTransitioning) return;
     setLoading(true);
-    const [startDateObj, endDateObj] = getStartEndDateObj(selectedDate);
+    const [startDateObj, endDateObj] = get3WeeksStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
     if (globalData.selectedTagId !== "a") {
       url += "&tag=" + globalData.selectedTagId
     }
     get(url, handleRetrieveScheduleItems);
-  }, [get, getStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
+  }, [get, get3WeeksStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId, slideTransitioning]);
+
+  const handleSlideNext = React.useCallback((swiper) => {
+    setSlideTransitioning(true);
+    gotoNextWeek();
+    setSlideIndex(getNextSlideIndex(slideIndex));
+    setSlideTransitioning(false);
+  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextWeek, setSlideTransitioning])
+
+  const handleSlidePrev = React.useCallback((swiper) => {
+    setSlideTransitioning(true);
+    gotoPrevWeek();
+    setSlideIndex(getPrevSlideIndex(slideIndex));
+    setSlideTransitioning(false);
+  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevWeek, setSlideTransitioning])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -141,8 +152,16 @@ export default function WeeklyCalendar() {
   }, [])
 
   const getSameDayStyle = React.useCallback((date) => {
-    return {border: 1, borderColor: "grey.300", backgroundColor: isSameDay(date, today.current)? "LightYellow":"White"}
+    return {border: 0.5, borderColor: "grey.500", backgroundColor: isSameDay(date, today.current)? "LightYellow":"White"}
   }, [today]);
+
+  const showCurrentWeekButton = React.useCallback((currIndex) => {
+    let filteredData = displayData.filter((data) => data.slideIndex === currIndex)
+    for(let data of filteredData) {
+      if (isSameDay(data.date, today.current)) return false; 
+    }
+    return true;
+  }, [today, displayData]);
 
   React.useEffect(() => {
     if (!modalOpen) retrieveScheduleItems(globalData.selectedDate, true);
@@ -153,8 +172,9 @@ export default function WeeklyCalendar() {
     return () => { window.document.removeEventListener('keyup', handleKeyUp); }
   }, [handleKeyUp]);
 
+
   return (
-    <Container maxWidth="md" sx={{p: 0}} {...swipeHandler}>
+    <Container maxWidth="md" sx={{p: "0 !important", overflowX: "hidden"}}>
       <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
@@ -177,37 +197,43 @@ export default function WeeklyCalendar() {
           <IconButton color="primary" onClick={gotoNextWeek}><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
-      <Grid container sx={{mt: 1, border: 1, borderColor: "grey.300"}}>
-        {displayData.map((data) => (
-          <React.Fragment key={data.date}>
-            <Grid item xs={3} sm={3} md={3} sx={getSameDayStyle(data.date)}>
-              <Box sx={{ p: 1 }}>
-                <Typography variant="body2" component="p" align="center" fontWeight="medium">{format(data.date, "d MMM")}</Typography>
-                <Typography variant="body2" component="p" align="center" fontWeight="medium">{data.day}</Typography>
-              </Box>
+      <Swiper loop={true} onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}>
+        {[0,1,2].map((slideIndex) => (
+          <SwiperSlide key={slideIndex}>
+            <Grid container sx={{mt: 1, border: 0.5, borderColor: "grey.500"}}>
+              {displayData.filter((data) => data.slideIndex === slideIndex).map((data) => (
+                <React.Fragment key={data.date}>
+                  <Grid item xs={3} sm={3} md={3} sx={getSameDayStyle(data.date)}>
+                    <Box sx={{ p: 1 }}>
+                      <Typography variant="body2" component="p" align="center" fontWeight="medium">{format(data.date, "d MMM")}</Typography>
+                      <Typography variant="body2" component="p" align="center" fontWeight="medium">{data.day}</Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={8} sm={8} md={8} sx={getSameDayStyle(data.date)}>
+                    <Box sx={{ p: 1 }}>
+                      {data.items.map((item) => (
+                        <React.Fragment key={item.id}>
+                          <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
+                        </React.Fragment>
+                      ))}
+                    </Box>
+                  </Grid>
+                  <Grid item xs={1} sm={1} md={1} sx={getSameDayStyle(data.date)}>
+                    <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
+                      <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
+                    </Box>
+                  </Grid>
+                </React.Fragment>
+              ))}
             </Grid>
-            <Grid item xs={8} sm={8} md={8} sx={getSameDayStyle(data.date)}>
-              <Box sx={{ p: 1 }}>
-                {data.items.map((item) => (
-                  <React.Fragment key={item.id}>
-                    <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
-                  </React.Fragment>
-                ))}
-              </Box>
-            </Grid>
-            <Grid item xs={1} sm={1} md={1} sx={getSameDayStyle(data.date)}>
-              <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
-                <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
-              </Box>
-            </Grid>
-          </React.Fragment>
+            { showCurrentWeekButton(slideIndex) ? 
+              <Stack alignItems="center">
+                <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current week</Button>
+              </Stack> : null
+            }
+          </SwiperSlide>
         ))}
-      </Grid>
-      { isSameWeek(globalData.selectedDate, today.current) ? null :
-        <Stack alignItems="center">
-          <Button variant="outlined" size="small" sx={{mt: 1}} onClick={() => setSelectedDateForAll(today.current)}>Current week</Button>
-        </Stack>
-      }
+      </Swiper>
       <ScheduleItemModal 
         open={modalOpen} 
         id={modalItem.id} 

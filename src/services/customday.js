@@ -7,7 +7,7 @@ import { useGlobalData } from '../services/globalData';
 
 export function useCustomDay() {
   const [customDayValue, setCustomDayValue] = React.useState(new Date());
-  const { getStartEndDateObj } = useCalendar();
+  const { getWeekStartEndDateObj } = useCalendar();
   const [,setGlobalData] = useGlobalData();
   const CustomPickersDay = styled(PickersDay, {
     shouldForwardProp: (prop) =>
@@ -35,7 +35,7 @@ export function useCustomDay() {
     if (!customDayValue) {
       return <PickersDay {...pickersDayProps} />;
     }
-    const [start, end] = getStartEndDateObj(customDayValue);
+    const [start, end] = getWeekStartEndDateObj(customDayValue);
     const dayIsBetween = isWithinInterval(date, { start, end });
     const isFirstDay = isSameDay(date, start);
     const isLastDay = isSameDay(date, end);
@@ -48,7 +48,7 @@ export function useCustomDay() {
         isLastDay={isLastDay}
       />
     );
-  }, [customDayValue, getStartEndDateObj]);
+  }, [customDayValue, getWeekStartEndDateObj]);
 
   const renderMonthPickerDay = React.useCallback((date, selectedDates, pickersDayProps) => {
     if (!customDayValue) {
