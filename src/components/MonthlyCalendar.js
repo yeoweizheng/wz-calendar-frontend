@@ -37,8 +37,8 @@ export default function MonthlyCalendar() {
   const selectedDateRef = React.useRef(globalData.selectedDate);
   const scheduleItems = React.useRef([]);
 
-  const handleRetrieveScheduleItems = React.useCallback((items=[]) => {
-    let oldItems = scheduleItems.current;
+  const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
+    let oldItems = replace? []:scheduleItems.current;
     scheduleItems.current = items;
     let data = [];
     let itemMapping = {};
@@ -94,7 +94,7 @@ export default function MonthlyCalendar() {
     if (globalData.selectedTagId !== "a") {
       url += "&tag=" + globalData.selectedTagId
     }
-    get(url, handleRetrieveScheduleItems);
+    get(url, (data) => {handleRetrieveScheduleItems(data, true)});
   }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const gotoNextMonth = React.useCallback((delay=0) => {

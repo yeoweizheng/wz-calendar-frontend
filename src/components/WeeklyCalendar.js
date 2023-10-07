@@ -45,8 +45,8 @@ export default function WeeklyCalendar() {
   const scheduleItems = React.useRef([]);
 
 
-  const handleRetrieveScheduleItems = React.useCallback((items=[]) => {
-    let oldItems = scheduleItems.current;
+  const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
+    let oldItems = replace? []:scheduleItems.current;
     scheduleItems.current = items;
     const dates = getDateObjIn3Weeks(selectedDateRef.current);
     let data = [];
@@ -117,7 +117,7 @@ export default function WeeklyCalendar() {
     if (globalData.selectedTagId !== "a") {
       url += "&tag=" + globalData.selectedTagId
     }
-    get(url, handleRetrieveScheduleItems);
+    get(url, (data) => {handleRetrieveScheduleItems(data, true)});
   }, [get, get3WeeksStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const handleSlideNext = React.useCallback((swiper) => {
