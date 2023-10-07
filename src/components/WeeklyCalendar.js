@@ -169,9 +169,10 @@ export default function WeeklyCalendar() {
   }, [today, displayData]);
 
   React.useEffect(() => {
+    if (!isSameDay(selectedDateRef.current, globalData.selectedDate)) selectedDateRef.current = globalData.selectedDate;
     if (!modalOpen) retrieveScheduleItems(globalData.selectedDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
+  }, [globalData.selectedDate, selectedDateRef, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);

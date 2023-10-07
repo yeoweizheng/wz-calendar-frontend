@@ -176,6 +176,7 @@ export default function MonthlyCalendar() {
   }, [today, displayData]);
 
   React.useEffect(() => {
+    if (!isSameDay(selectedDateRef.current, globalData.selectedDate)) selectedDateRef.current = globalData.selectedDate;
     retrieveScheduleItems(globalData.selectedDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
