@@ -123,13 +123,13 @@ export default function WeeklyCalendar() {
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoNextWeek(300);
+    gotoNextWeek(50);
   }, [slideIndex, gotoNextWeek, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoPrevWeek(300);
+    gotoPrevWeek(50);
   }, [slideIndex, gotoPrevWeek, swiperDestroyed])
 
   const openModal = (id, date) => {

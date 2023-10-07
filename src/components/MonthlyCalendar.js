@@ -116,13 +116,13 @@ export default function MonthlyCalendar() {
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoNextMonth(300)
+    gotoNextMonth(50)
   }, [slideIndex, gotoNextMonth, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     slideIndex.current = swiper.realIndex;
-    gotoPrevMonth(300);
+    gotoPrevMonth(50);
   }, [gotoPrevMonth, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {
