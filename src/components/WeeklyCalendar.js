@@ -39,7 +39,6 @@ export default function WeeklyCalendar() {
   const {openSnackbar} = useSnackbar();
   const [loading, setLoading] = React.useState(false);
   const [slideIndex, setSlideIndex] = React.useState(0);
-  const [slideTransitioning, setSlideTransitioning] = React.useState(false);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
   const swiperDestroyed = React.useRef(false);
   let scheduleItems = React.useRef([]);
@@ -93,7 +92,6 @@ export default function WeeklyCalendar() {
   }, [getDateObjIn3Weeks, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
-    if (slideTransitioning) return;
     setLoading(true);
     const [startDateObj, endDateObj] = get3WeeksStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
@@ -101,23 +99,19 @@ export default function WeeklyCalendar() {
       url += "&tag=" + globalData.selectedTagId
     }
     get(url, handleRetrieveScheduleItems);
-  }, [get, get3WeeksStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId, slideTransitioning]);
+  }, [get, get3WeeksStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    setSlideTransitioning(true);
     gotoNextWeek();
     setSlideIndex(swiper.realIndex);
-    setSlideTransitioning(false);
-  }, [setSlideIndex, gotoNextWeek, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoNextWeek, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    setSlideTransitioning(true);
     gotoPrevWeek();
     setSlideIndex(swiper.realIndex);
-    setSlideTransitioning(false);
-  }, [setSlideIndex, gotoPrevWeek, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoPrevWeek, swiperDestroyed])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -168,7 +162,8 @@ export default function WeeklyCalendar() {
 
   React.useEffect(() => {
     if (!modalOpen) retrieveScheduleItems(globalData.selectedDate);
-  }, [retrieveScheduleItems, globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalData.selectedDate, modalOpen, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -201,7 +196,7 @@ export default function WeeklyCalendar() {
         </Stack>
       </Stack>
       <Swiper loop={true} 
-        onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev}
+        onSlideNextTransitionStart={handleSlideNext} onSlidePrevTransitionStart={handleSlidePrev}
         onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0,1,2].map((slideIndex) => (
           <SwiperSlide key={slideIndex}>

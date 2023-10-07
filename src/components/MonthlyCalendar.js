@@ -32,7 +32,6 @@ export default function MonthlyCalendar() {
   const {renderMonthPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const [loading, setLoading] = React.useState(false);
   const [slideIndex, setSlideIndex] = React.useState(0);
-  const [slideTransitioning, setSlideTransitioning] = React.useState(false);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
   const swiperDestroyed = React.useRef(false);
 
@@ -75,7 +74,6 @@ export default function MonthlyCalendar() {
   }, [getDateObjIn3Months, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex]);
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
-    if (slideTransitioning) return;
     setLoading(true);
     const [startDateObj, endDateObj] = get3MonthsStartEndDateObj(selectedDate);
     let url = 'schedule_items/?start_date=' + format(startDateObj, 'yyyy-MM-dd') + '&end_date=' + format(endDateObj, 'yyyy-MM-dd');
@@ -83,7 +81,7 @@ export default function MonthlyCalendar() {
       url += "&tag=" + globalData.selectedTagId
     }
     get(url, handleRetrieveScheduleItems);
-  }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId, slideTransitioning]);
+  }, [get, get3MonthsStartEndDateObj, handleRetrieveScheduleItems, globalData.selectedTagId]);
 
   const gotoNextMonth = React.useCallback(() => {
     const newDate = add(startOfMonth(globalData.selectedDate), {"months": 1})
@@ -97,19 +95,15 @@ export default function MonthlyCalendar() {
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    setSlideTransitioning(true);
     gotoNextMonth()
     setSlideIndex(swiper.realIndex);
-    setSlideTransitioning(false);
-  }, [setSlideIndex, gotoNextMonth, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoNextMonth, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    setSlideTransitioning(true);
     gotoPrevMonth();
     setSlideIndex(swiper.realIndex);
-    setSlideTransitioning(false);
-  }, [setSlideIndex, gotoPrevMonth, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoPrevMonth, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -174,7 +168,8 @@ export default function MonthlyCalendar() {
 
   React.useEffect(() => {
     retrieveScheduleItems(globalData.selectedDate);
-  }, [retrieveScheduleItems, globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -206,7 +201,7 @@ export default function MonthlyCalendar() {
         </Stack>
       </Stack>
       <Swiper loop={true} 
-        onSlideNextTransitionEnd={handleSlideNext} onSlidePrevTransitionEnd={handleSlidePrev} 
+        onSlideNextTransitionStart={handleSlideNext} onSlidePrevTransitionStart={handleSlidePrev} 
         onAfterInit={() => swiperDestroyed.current=false} onBeforeDestroy={() => {swiperDestroyed.current=true}}>
         {[0, 1, 2].map((slideIndex) => (
           <SwiperSlide key={"slide"+slideIndex}>
