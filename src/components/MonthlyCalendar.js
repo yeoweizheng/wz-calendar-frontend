@@ -85,12 +85,12 @@ export default function MonthlyCalendar() {
 
   const gotoNextMonth = React.useCallback(() => {
     const newDate = add(startOfMonth(globalData.selectedDate), {"months": 1})
-    setSelectedDateForAll(newDate);
+    setTimeout(() =>setSelectedDateForAll(newDate), 0);
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const gotoPrevMonth = React.useCallback(() => {
     const newDate = sub(startOfMonth(globalData.selectedDate), {"months": 1})
-    setSelectedDateForAll(newDate);
+    setTimeout(() => setSelectedDateForAll(newDate), 0);
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleSlideNext = React.useCallback((swiper) => {

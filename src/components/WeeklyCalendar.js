@@ -45,12 +45,12 @@ export default function WeeklyCalendar() {
 
   const gotoNextWeek = React.useCallback(() => {
     const newDate = add(globalData.selectedDate, {"weeks": 1})
-    setSelectedDateForAll(newDate);
+    setTimeout(() => setSelectedDateForAll(newDate), 0)
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const gotoPrevWeek = React.useCallback(() => {
     const newDate = sub(globalData.selectedDate, {"weeks": 1})
-    setSelectedDateForAll(newDate);
+    setTimeout(() => setSelectedDateForAll(newDate), 0);
   }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleKeyUp = React.useCallback((e) => {
