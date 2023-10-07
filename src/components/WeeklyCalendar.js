@@ -46,20 +46,16 @@ export default function WeeklyCalendar() {
 
 
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
-    let oldItems = replace? [] : scheduleItems.current;
     scheduleItems.current = replace? items : scheduleItems.current;
     const dates = getDateObjIn3Weeks(selectedDateRef.current);
     let data = [];
     let itemMapping = {};
-    let itemIds = [];
-    for (let item of oldItems.concat(items)) {
-      if (itemIds.includes(item.id)) continue;
+    for (let item of scheduleItems.current) {
       if (item.date in itemMapping) {
         itemMapping[item.date].push(item);
       } else {
         itemMapping[item.date] = [item];
       }
-      itemIds.push(item.id);
     }
     for (let i = 0; i < 21; i++) {
       let dateStr = format(dates[i], "yyyy-MM-dd");
