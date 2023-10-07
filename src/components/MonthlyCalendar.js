@@ -99,17 +99,17 @@ export default function MonthlyCalendar() {
     if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoNextMonth()
-    setSlideIndex(getNextSlideIndex(slideIndex));
+    setSlideIndex(swiper.realIndex);
     setSlideTransitioning(false);
-  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextMonth, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoNextMonth, setSlideTransitioning, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoPrevMonth();
-    setSlideIndex(getPrevSlideIndex(slideIndex));
+    setSlideIndex(swiper.realIndex);
     setSlideTransitioning(false);
-  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevMonth, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoPrevMonth, setSlideTransitioning, swiperDestroyed])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;

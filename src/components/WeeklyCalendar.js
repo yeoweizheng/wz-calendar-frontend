@@ -107,17 +107,17 @@ export default function WeeklyCalendar() {
     if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoNextWeek();
-    setSlideIndex(getNextSlideIndex(slideIndex));
+    setSlideIndex(swiper.realIndex);
     setSlideTransitioning(false);
-  }, [getNextSlideIndex, slideIndex, setSlideIndex, gotoNextWeek, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoNextWeek, setSlideTransitioning, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
     setSlideTransitioning(true);
     gotoPrevWeek();
-    setSlideIndex(getPrevSlideIndex(slideIndex));
+    setSlideIndex(swiper.realIndex);
     setSlideTransitioning(false);
-  }, [getPrevSlideIndex, slideIndex, setSlideIndex, gotoPrevWeek, setSlideTransitioning, swiperDestroyed])
+  }, [setSlideIndex, gotoPrevWeek, setSlideTransitioning, swiperDestroyed])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
