@@ -38,68 +38,20 @@ export default function WeeklyCalendar() {
   const {renderWeekPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
   const {openSnackbar} = useSnackbar();
   const [loading, setLoading] = React.useState(false);
-  const slideIndex = React.useRef(0);
+  const [slideIndex, setSlideIndex] = React.useState(0);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
   const swiperDestroyed = React.useRef(false);
-  const selectedDateRef = React.useRef(globalData.selectedDate);
-  const scheduleItems = React.useRef([]);
-
-
-  const handleRetrieveScheduleItems = React.useCallback((items=[]) => {
-    let oldItems = scheduleItems.current;
-    scheduleItems.current = items;
-    const dates = getDateObjIn3Weeks(selectedDateRef.current);
-    let data = [];
-    let itemMapping = {};
-    let itemIds = [];
-    for (let item of oldItems) {
-      if (item.date in itemMapping) {
-        itemMapping[item.date].push(item);
-      } else {
-        itemMapping[item.date] = [item];
-      }
-      itemIds.push(item.id);
-    }
-    for (let item of items) {
-      if (itemIds.includes(item.id)) continue;
-      if (item.date in itemMapping) {
-        itemMapping[item.date].push(item);
-      } else {
-        itemMapping[item.date] = [item];
-      }
-    }
-    for (let i = 0; i < 21; i++) {
-      let dateStr = format(dates[i], "yyyy-MM-dd");
-      let dataSlideIndex;
-      if (i < 7) dataSlideIndex = getPrevSlideIndex(slideIndex.current);
-      if (i >= 7 && i < 14) dataSlideIndex = slideIndex.current;
-      if (i >= 14) dataSlideIndex = getNextSlideIndex(slideIndex.current);
-      data.push({
-        "date": dates[i],
-        "day": format(dates[i], "E"),
-        "items": dateStr in itemMapping? itemMapping[dateStr] : [],
-        "slideIndex": dataSlideIndex
-      });
-    }
-    setLoading(false);
-    setDisplayData(data);
-  }, [getDateObjIn3Weeks, selectedDateRef, slideIndex, getPrevSlideIndex, getNextSlideIndex])
+  let scheduleItems = React.useRef([]);
 
   const gotoNextWeek = React.useCallback(() => {
-    const newDate = add(selectedDateRef.current, {"weeks": 1})
-    setTimeout(() => {
-      setSelectedDateForAll(newDate, selectedDateRef)
-      handleRetrieveScheduleItems();
-    }, 0)
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+    const newDate = add(globalData.selectedDate, {"weeks": 1})
+    setTimeout(() => setSelectedDateForAll(newDate), 0)
+  }, [setSelectedDateForAll, globalData.selectedDate])
 
   const gotoPrevWeek = React.useCallback(() => {
-    const newDate = sub(selectedDateRef.current, {"weeks": 1})
-    setTimeout(() => {
-      setSelectedDateForAll(newDate, selectedDateRef)
-      handleRetrieveScheduleItems();
-    }, 0);
-  }, [setSelectedDateForAll, selectedDateRef, handleRetrieveScheduleItems])
+    const newDate = sub(globalData.selectedDate, {"weeks": 1})
+    setTimeout(() => setSelectedDateForAll(newDate), 0);
+  }, [setSelectedDateForAll, globalData.selectedDate])
 
   const handleKeyUp = React.useCallback((e) => {
     if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
@@ -109,6 +61,35 @@ export default function WeeklyCalendar() {
       gotoNextWeek();
     }
   }, [gotoPrevWeek, gotoNextWeek, loading, modalOpen, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
+
+  const handleRetrieveScheduleItems = React.useCallback((items) => {
+    scheduleItems.current = items;
+    const dates = getDateObjIn3Weeks(globalData.selectedDate);
+    let data = [];
+    let itemMapping = {};
+    for (let item of items) {
+      if (item.date in itemMapping) {
+        itemMapping[item.date].push(item);
+      } else {
+        itemMapping[item.date] = [item];
+      }
+    }
+    for (let i = 0; i < 21; i++) {
+      let dateStr = format(dates[i], "yyyy-MM-dd");
+      let dataSlideIndex;
+      if (i < 7) dataSlideIndex = getPrevSlideIndex(slideIndex);
+      if (i >= 7 && i < 14) dataSlideIndex = slideIndex;
+      if (i >= 14) dataSlideIndex = getNextSlideIndex(slideIndex);
+      data.push({
+        "date": dates[i],
+        "day": format(dates[i], "E"),
+        "items": dateStr in itemMapping? itemMapping[dateStr] : [],
+        "slideIndex": dataSlideIndex
+      });
+    }
+    setLoading(false);
+    setDisplayData(data);
+  }, [getDateObjIn3Weeks, globalData.selectedDate, slideIndex, getPrevSlideIndex, getNextSlideIndex])
 
   const retrieveScheduleItems = React.useCallback((selectedDate) => {
     setLoading(true);
@@ -122,15 +103,15 @@ export default function WeeklyCalendar() {
 
   const handleSlideNext = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    slideIndex.current = swiper.realIndex;
     gotoNextWeek();
-  }, [slideIndex, gotoNextWeek, swiperDestroyed])
+    setSlideIndex(swiper.realIndex);
+  }, [setSlideIndex, gotoNextWeek, swiperDestroyed])
 
   const handleSlidePrev = React.useCallback((swiper) => {
     if (swiperDestroyed.current) return;
-    slideIndex.current = swiper.realIndex;
     gotoPrevWeek();
-  }, [slideIndex, gotoPrevWeek, swiperDestroyed])
+    setSlideIndex(swiper.realIndex);
+  }, [setSlideIndex, gotoPrevWeek, swiperDestroyed])
 
   const openModal = (id, date) => {
     if (date) {  // specify date for create modal
@@ -197,10 +178,10 @@ export default function WeeklyCalendar() {
         <Stack direction="row" sx={{pt: 2}}>
           <IconButton color="primary" onClick={gotoPrevWeek}><ArrowBackIcon /></IconButton>
           <MobileDatePicker
-            value={selectedDateRef.current}
+            value={globalData.selectedDate}
             label="Select week"
             onChange={(value) => {setCustomDayValue(value)}}
-            onAccept={(value) => {setSelectedDateForAll(value, selectedDateRef); handleRetrieveScheduleItems();}}
+            onAccept={(value) => {setSelectedDateForAll(value)}}
             onOpen={() => setDatePickerOpen(true)}
             onClose={() => setDatePickerOpen(false)}
             renderDay={renderWeekPickerDay}
@@ -248,8 +229,8 @@ export default function WeeklyCalendar() {
             { showCurrentWeekButton(slideIndex) ? 
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
-                  onTouchStart={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
-                  onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
+                  onTouchStart={() => setSelectedDateForAll(today.current)}
+                  onClick={() => setSelectedDateForAll(today.current)}
                   >Current week</Button>
               </Stack> : null
             }

@@ -69,10 +69,9 @@ export function useCustomDay() {
       />
     );
   }, [customDayValue]);
-  const setSelectedDateForAll = React.useCallback((date, ref=null) => {
+  const setSelectedDateForAll = React.useCallback((date) => {
     setGlobalData((prev) => ({...prev, selectedDate: date}))
     setCustomDayValue(date);
-    if (ref) ref.current = date;
   }, [setGlobalData, setCustomDayValue])
   return { renderWeekPickerDay, setCustomDayValue, renderMonthPickerDay, setSelectedDateForAll }
 }
