@@ -11,7 +11,7 @@ import { useNav } from '../services/nav';
 
 export default function Login() {
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { openSnackbar } = useSnackbar();
@@ -19,16 +19,20 @@ export default function Login() {
 
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
-  const handleSuccess = () => {
+  const handleSuccess = React.useCallback(() => {
     ensureCalView();
     navigate(fromUrl, { replace: true });
-  }
+  }, [ensureCalView, navigate, fromUrl]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     login(data.get("username"), data.get("password"), handleSuccess, () => {openSnackbar("Login failed.", "error")});
   }
+
+  React.useEffect(() => {
+    if (isAuthenticated()) handleSuccess();
+  }, [isAuthenticated, handleSuccess])
 
   return (
     <Container maxWidth="xs">
