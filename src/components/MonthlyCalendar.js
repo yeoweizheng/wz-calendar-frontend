@@ -164,8 +164,7 @@ export default function MonthlyCalendar() {
       }
     }
     return style;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [today, displayData, getPrevSlideIndex, getNextSlideIndex]);
+  }, [today, getPrevSlideIndex, getNextSlideIndex]);
 
   const showCurrentMonthButton = React.useCallback((currIndex) => {
     if (displayData.length === 0) return false;

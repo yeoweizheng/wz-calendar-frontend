@@ -13,26 +13,29 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 import EditIcon from '@mui/icons-material/Edit';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Divider from '@mui/material/Divider';
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useHttp } from '../services/http';
 import TagModal from './TagModal';
 import { useAuth } from '../services/auth';
 import { useSnackbar } from '../services/snackbar';
+import { useNav } from '../services/nav';
 
-
-export default function Sidebar(props) {
+export default function Sidebar() {
   const [globalData, setGlobalData] = useGlobalData();
   const { get } = useHttp();
   const [tagModalType, setTagModalType] = React.useState("create");
   const {openSnackbar} = useSnackbar();
   const { logout } = useAuth();
+  const { ensureCalView } = useNav();
 
   const isTagSelected = React.useCallback((tagId) => {
     return tagId === globalData.selectedTagId;
   }, [globalData.selectedTagId])
 
   const handleSelectTag = React.useCallback((tagId) => {
+    ensureCalView();
     setGlobalData((prev) => ({...prev, selectedTagId: tagId, sidebarOpen: false}))
-  }, [setGlobalData])
+  }, [setGlobalData, ensureCalView])
 
   const handleRetrieveTags = React.useCallback((data) => {
     let newTags = globalData.defaultTags.slice(0, 1);
@@ -47,9 +50,10 @@ export default function Sidebar(props) {
   }, [get, handleRetrieveTags])
 
   const openTagModal = React.useCallback((type) => {
+    ensureCalView();
     setTagModalType(type);
     setGlobalData((prev) => ({...prev, sidebarOpen: false, tagModalOpen: true}));
-  }, [setGlobalData])
+  }, [setGlobalData, ensureCalView])
 
   const handleTagModalClose = React.useCallback((alertMsg=null, severity=null) => {
     if (alertMsg !== null && severity !== null) {
@@ -96,6 +100,10 @@ export default function Sidebar(props) {
           </List>
           <Divider />
           <List>
+            <ListItem button key="settings" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false, calView: "settings"}));}}>
+              <ListItemIcon><SettingsIcon /></ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItem>
             <ListItem button key="logout" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false})); logout();}}>
               <ListItemIcon><LogoutIcon /></ListItemIcon>
               <ListItemText primary="Logout" />

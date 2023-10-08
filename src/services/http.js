@@ -21,13 +21,13 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          openSnackbar("Failed to retrieve data. Please refresh and try again.", "error", false);
+          openSnackbar("Failed to retrieve data. Please refresh and try again.", "error");
         }
         errorCallback(err);
       });
   }, [token, logout, openSnackbar])
 
-  const post = React.useCallback((url, data, successCallback, errorCallback=()=>{}, useAuth=true) => {
+  const post = React.useCallback((url, data, successCallback, errorCallback=()=>{}, useAuth=true, showDefaultMsg=true) => {
     let config = {};
     if (useAuth) {
       config = { headers: { Authorization: "JWT " + token } }
@@ -40,7 +40,7 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          openSnackbar("Failed to upload data. Please refresh and try again.", "error", false);
+          if (showDefaultMsg) openSnackbar("Failed to upload data. Please refresh and try again.", "error");
         }
         errorCallback(err);
       });

@@ -9,19 +9,22 @@ import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth'
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuth } from "../services/auth";
 import { useGlobalData } from '../services/globalData';
+import { useNav } from '../services/nav';
 
 export default function TopAppBar() {
 
   const { isAuthenticated } = useAuth();
   const [globalData, setGlobalData] = useGlobalData();
+  const { ensureCalView } = useNav();
 
   const toggleSidebar = React.useCallback(() => {
     setGlobalData((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }))
   }, [setGlobalData])
 
   const openSearchModal = React.useCallback(() => {
+    ensureCalView();
     setGlobalData((prev) => ({...prev, searchModalOpen: true}));
-  }, [setGlobalData])
+  }, [setGlobalData, ensureCalView])
 
   const toggleCalView = React.useCallback(() => {
     let calView = globalData.calView === "weekly" ? "monthly" : "weekly";
