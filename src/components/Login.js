@@ -7,6 +7,7 @@ import Container from '@mui/material/Container';
 import { useAuth } from "../services/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSnackbar } from '../services/snackbar';
+import { useNav } from '../services/nav';
 
 export default function Login() {
 
@@ -14,10 +15,12 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { openSnackbar } = useSnackbar();
+  const { ensureCalView } = useNav();
 
   const fromUrl = location.state?.fromLocation?.pathname || "/";
 
   const handleSuccess = () => {
+    ensureCalView();
     navigate(fromUrl, { replace: true });
   }
 
