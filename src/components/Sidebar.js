@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Box from '@mui/material/Box';
@@ -26,11 +26,11 @@ export default function Sidebar() {
   const [tagModalType, setTagModalType] = React.useState("create");
   const {openSnackbar} = useSnackbar();
   const { logout } = useAuth();
-  const { ensureCalView } = useNav();
+  const { isCalView, ensureCalView, isSettingsView } = useNav();
 
   const isTagSelected = React.useCallback((tagId) => {
-    return tagId === globalData.selectedTagId;
-  }, [globalData.selectedTagId])
+    return isCalView() && tagId === globalData.selectedTagId;
+  }, [globalData.selectedTagId, isCalView])
 
   const handleSelectTag = React.useCallback((tagId) => {
     ensureCalView();
@@ -72,7 +72,7 @@ export default function Sidebar() {
         <Box style={{"width": "250px"}}>
           <List>
             {globalData.tags.map((tag) => (
-              <ListItem button key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
+              <ListItemButton key={tag.id} selected={isTagSelected(tag.id)} onClick={() => handleSelectTag(tag.id)}>
                 <ListItemIcon>
                 {
                   tag.id === "a"? <CalendarTodayIcon /> :
@@ -81,33 +81,33 @@ export default function Sidebar() {
                 }
                 </ListItemIcon>
                 <ListItemText primary={tag.name} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
           <Divider />
           <List>
-            <ListItem button key="createTag" onClick={() => openTagModal("create")}>
+            <ListItemButton key="createTag" onClick={() => openTagModal("create")}>
               <ListItemIcon><AddBoxIcon /></ListItemIcon>
               <ListItemText primary="New Tag" />
-            </ListItem>
+            </ListItemButton>
             {globalData.tags.length > 2 ? 
-              <ListItem button key="editTag" onClick={() => openTagModal("edit")}>
+              <ListItemButton key="editTag" onClick={() => openTagModal("edit")}>
                 <ListItemIcon><EditIcon /></ListItemIcon>
                 <ListItemText primary="Edit Tag" />
-              </ListItem>
+              </ListItemButton>
               : null
             }
           </List>
           <Divider />
           <List>
-            <ListItem button key="settings" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false, calView: "settings"}));}}>
+            <ListItemButton key="settings" selected={isSettingsView()} onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false, calView: "settings"}));}}>
               <ListItemIcon><SettingsIcon /></ListItemIcon>
               <ListItemText primary="Settings" />
-            </ListItem>
-            <ListItem button key="logout" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false})); logout();}}>
+            </ListItemButton>
+            <ListItemButton key="logout" onClick={() => {setGlobalData((prev) => ({...prev, sidebarOpen: false})); logout();}}>
               <ListItemIcon><LogoutIcon /></ListItemIcon>
               <ListItemText primary="Logout" />
-            </ListItem>
+            </ListItemButton>
           </List>
         </Box>
       </Drawer>

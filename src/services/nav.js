@@ -4,9 +4,17 @@ import { useGlobalData } from './globalData';
 export function useNav() {
   const [globalData, setGlobalData] = useGlobalData();
 
-  const ensureCalView = React.useCallback(() => {
-    if (!["weekly", "monthly"].includes(globalData.calView)) setGlobalData((prev) => ({...prev, calView: "weekly"}));
-  }, [globalData.calView, setGlobalData]);
+  const isCalView = React.useCallback(() => {
+    return ["weekly", "monthly"].includes(globalData.calView);
+  }, [globalData.calView]);
 
-  return { ensureCalView }
+  const ensureCalView = React.useCallback(() => {
+    if (!isCalView()) setGlobalData((prev) => ({...prev, calView: "weekly"}));
+  }, [isCalView, setGlobalData]);
+
+  const isSettingsView = React.useCallback(() => {
+    return globalData.calView === "settings";
+  }, [globalData.calView])
+
+  return { isCalView, ensureCalView, isSettingsView }
 }
