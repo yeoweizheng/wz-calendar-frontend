@@ -27,7 +27,7 @@ export default function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    login(data.get("username"), data.get("password"), handleSuccess, () => {openSnackbar("Login failed.", "error")});
+    login(data.get("username"), data.get("password"), handleSuccess, () => {openSnackbar("Login failed", "error")});
   }
 
   React.useEffect(() => {

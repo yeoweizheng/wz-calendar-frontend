@@ -21,17 +21,17 @@ export default function Settings() {
     let newPassword = data.get("newPassword");
     let newPasswordConfirm = data.get("newPasswordConfirm");
     if (!currentPassword || !newPassword || !newPasswordConfirm) {
-      openSnackbar("Please fill in all fields.", "error");
+      openSnackbar("Please fill in all fields", "error");
     } else if (newPassword !== newPasswordConfirm) {
-      openSnackbar("Passwords do not match.", "error");
+      openSnackbar("Passwords do not match", "error");
     } else {
       let payload = {"currentPassword": currentPassword, "newPassword": newPassword};
       post("update_password/", payload, 
         () => {
-          openSnackbar("Password changed.", "success");
+          openSnackbar("Password changed", "success");
           resetButton.current.click();
         },
-        () => openSnackbar("Failed to change password.", "error"),
+        () => openSnackbar("Failed to change password", "error"),
         true, false);
     }
   };

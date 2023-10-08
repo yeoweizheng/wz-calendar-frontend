@@ -21,7 +21,7 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          openSnackbar("Failed to retrieve data. Please refresh and try again.", "error");
+          openSnackbar("Failed to retrieve data", "error");
         }
         errorCallback(err);
       });
@@ -40,7 +40,7 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          if (showDefaultMsg) openSnackbar("Failed to upload data. Please refresh and try again.", "error");
+          if (showDefaultMsg) openSnackbar("Failed to upload data", "error");
         }
         errorCallback(err);
       });
@@ -59,7 +59,7 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          openSnackbar("Failed to upload data. Please refresh and try again.", "error", false);
+          openSnackbar("Failed to upload data", "error", false);
         }
         errorCallback(err);
       });
@@ -78,7 +78,7 @@ export function useHttp() {
         try {
           if (err.response.status === 401) logout();
         } catch (e) {
-          openSnackbar("Failed to delete data. Please refresh and try again.", "error", false);
+          openSnackbar("Failed to delete data", "error", false);
         }
         errorCallback(err);
       });
