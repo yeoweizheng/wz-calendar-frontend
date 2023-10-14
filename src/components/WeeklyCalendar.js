@@ -23,6 +23,7 @@ import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useSlide } from '../services/slide';
+import { useTouch } from '../services/touch';
 
 export default function WeeklyCalendar() {
 
@@ -43,6 +44,8 @@ export default function WeeklyCalendar() {
   const swiperDestroyed = React.useRef(false);
   const selectedDateRef = React.useRef(globalData.selectedDate);
   const scheduleItems = React.useRef([]);
+  const { registerTouch, handleTouch, defaultTouchRef } = useTouch();
+  const touchRef = React.useRef(defaultTouchRef());
 
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
     scheduleItems.current = replace? items : scheduleItems.current;
@@ -222,14 +225,23 @@ export default function WeeklyCalendar() {
                     <Box sx={{ p: 1 }}>
                       {data.items.map((item) => (
                         <React.Fragment key={item.id}>
-                          <Chip label={getChipLabel(item)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
+                          <Chip label={getChipLabel(item)} size="small" color={item.done? "success": "primary"} 
+                            onClick={() => openModal(item.id)} 
+                            onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                            onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(item.id))} 
+                            sx={{ fontWeight: "medium" }}>
+                          </Chip>
                         </React.Fragment>
                       ))}
                     </Box>
                   </Grid>
                   <Grid item xs={1} sm={1} md={1} sx={getSameDayStyle(data.date)}>
                     <Box sx={{ pt: 1, pb: 1 }} textAlign="center">
-                      <IconButton size="small" onClick={() => openModal(0, data.date)}><AddBoxIcon fontSize="small" /></IconButton>
+                      <IconButton size="small" 
+                        onClick={() => openModal(0, data.date)}
+                        onTouchStart={(e) => registerTouch(e, touchRef.current)}
+                        onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(0, data.date))}
+                        ><AddBoxIcon fontSize="small" /></IconButton>
                     </Box>
                   </Grid>
                 </React.Fragment>
@@ -239,7 +251,8 @@ export default function WeeklyCalendar() {
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
                   onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
-                  onTouchEnd={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
+                  onTouchStart={(e) => registerTouch(e, touchRef.current)}
+                  onTouchEnd={(e) => handleTouch(e, touchRef.current, () => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();})}
                   >Current week</Button>
               </Stack> : null
             }

@@ -19,6 +19,7 @@ import Fade from '@mui/material/Fade';
 import LinearProgress from '@mui/material/LinearProgress';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useSlide } from '../services/slide';
+import { useTouch } from '../services/touch';
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
@@ -35,6 +36,8 @@ export default function MonthlyCalendar() {
   const swiperDestroyed = React.useRef(false);
   const selectedDateRef = React.useRef(globalData.selectedDate);
   const scheduleItems = React.useRef([]);
+  const { registerTouch, handleTouch, defaultTouchRef } = useTouch();
+  const touchRef = React.useRef(defaultTouchRef());
 
   const handleRetrieveScheduleItems = React.useCallback((items=[], replace=false) => {
     scheduleItems.current = replace? items : scheduleItems.current;
@@ -222,7 +225,11 @@ export default function MonthlyCalendar() {
             {displayData.filter((weekData) => weekData[0].slideIndices.includes(slideIndex)).map((weekData) => (
               <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={"week-"+weekData[0].date}>
                 {weekData.map((dayData) => (
-                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}>
+                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} 
+                    onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}
+                    onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                    onTouchEnd={(e) => handleTouch(e, touchRef.current, () => gotoWeek(dayData.date))} 
+                    >
                     <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
                     {dayData.items.map((item) => (
                       <React.Fragment key={item.id}>
@@ -237,7 +244,8 @@ export default function MonthlyCalendar() {
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
                   onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
-                  onTouchEnd={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
+                  onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                  onTouchEnd={(e) => handleTouch(e, touchRef.current, () => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();})} 
                   >Current month</Button>
               </Stack> : null
             }
