@@ -222,10 +222,7 @@ export default function MonthlyCalendar() {
             {displayData.filter((weekData) => weekData[0].slideIndices.includes(slideIndex)).map((weekData) => (
               <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={"week-"+weekData[0].date}>
                 {weekData.map((dayData) => (
-                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} 
-                    onClick={() => gotoWeek(dayData.date)} 
-                    onTouchEnd={() => gotoWeek(dayData.date)} 
-                    key={slideIndex+"-date-"+dayData.date}>
+                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}>
                     <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
                     {dayData.items.map((item) => (
                       <React.Fragment key={item.id}>
