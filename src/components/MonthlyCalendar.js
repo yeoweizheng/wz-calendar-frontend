@@ -23,7 +23,7 @@ import { useTouch } from '../services/touch';
 
 export default function MonthlyCalendar() {
   const [globalData, setGlobalData] = useGlobalData();
-  const {getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek} = useCalendar();
+  const {getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek, getTimeStr} = useCalendar();
   const [displayData, setDisplayData] = React.useState([]);
   const { get } = useHttp();
   const theme = useTheme();
@@ -233,7 +233,7 @@ export default function MonthlyCalendar() {
                     <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
                     {dayData.items.map((item) => (
                       <React.Fragment key={item.id}>
-                        <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name}</Typography>
+                        <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name+getTimeStr(item.time)}</Typography>
                       </React.Fragment>
                     ))}
                   </Grid>
