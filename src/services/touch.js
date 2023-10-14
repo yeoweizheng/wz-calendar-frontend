@@ -17,7 +17,10 @@ export function useTouch() {
   const handleTouch = React.useCallback((event, ref, callback) => {
     let thresholdPx = 20;
     let thresholdMs = 500;
-    if (Math.abs(event.changedTouches[0].clientX-ref.current.x) <= thresholdPx && Math.abs(event.changedTouches[0].clientY-ref.current.y) <= thresholdPx && event.timeStamp-ref.current.timeStamp <= thresholdMs) callback();
+    if (Math.abs(event.changedTouches[0].clientX-ref.current.x) <= thresholdPx && Math.abs(event.changedTouches[0].clientY-ref.current.y) <= thresholdPx && event.timeStamp-ref.current.timeStamp <= thresholdMs) {
+      callback();
+      event.preventDefault();
+    }
     ref.current = defaultTouchRef();
   }, [defaultTouchRef])
 
