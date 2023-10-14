@@ -39,7 +39,7 @@ export default function TopAppBar() {
             <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={toggleSidebar}> <MenuIcon /> </IconButton>
             : null
           }
-          <Typography variant="h6" component="div" sx={{ flex: 1 }}> WZ Calendar </Typography>
+          <Typography variant="h6" component="div" sx={{ flex: 1 }}> Calendar </Typography>
           {isAuthenticated() ?
             <React.Fragment>
               <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={openSearchModal}> <SearchIcon /> </IconButton>

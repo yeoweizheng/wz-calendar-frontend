@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
 import { useHttp } from '../services/http';
 import MobileDatePicker from '@mui/lab/MobileDatePicker';
+import MobileTimePicker from '@mui/lab/MobileTimePicker';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -18,10 +19,12 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import AlarmIcon from '@mui/icons-material/Alarm';
+import AlarmOffIcon from '@mui/icons-material/AlarmOff';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { format } from 'date-fns';
+import { format, startOfHour, parse } from 'date-fns';
 import { InputAdornment } from '@mui/material';
 import { useSnackbar } from '../services/snackbar';
 
@@ -29,7 +32,9 @@ export default function ScheduleItemModal(props) {
   const [name, setName] = React.useState(props.name);
   const [nameError, setNameError] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
+  const [time, setTime] = React.useState(startOfHour(new Date()));
   const [done, setDone] = React.useState(false);
+  const [showTime, setShowTime] = React.useState(false);
   const {post, patch, del} = useHttp()
   const baseUrl = 'schedule_items/';
   const patchUrl = baseUrl + props.id + '/';
@@ -51,6 +56,7 @@ export default function ScheduleItemModal(props) {
     const payload = {
       "name": name,
       "date": format(date, "yyyy-MM-dd"),
+      "time": showTime ? format(time, "HH:mm:ss") : "",
       "done": done,
       "tag": tagId
     }
@@ -59,7 +65,7 @@ export default function ScheduleItemModal(props) {
     } else {
       post(baseUrl, payload, (data) => props.handleClose("Created " + data.name, "success"));
     }
-  }, [name, post, patch, props, baseUrl, patchUrl, date, done, selectedTagId])
+  }, [name, post, patch, props, baseUrl, patchUrl, date, done, selectedTagId, showTime, time])
 
   const handleNameChange = React.useCallback((e) => {
     setNameError(false);
@@ -88,16 +94,36 @@ export default function ScheduleItemModal(props) {
     }
   }, [props, copyToClipboard]);
 
+  const toggleShowTime = React.useCallback(() => {
+    setShowTime(!showTime);
+  }, [showTime, setShowTime]);
+
+  const getTimeToggleButton = React.useCallback(() => {
+    return (
+      <InputAdornment position="end">
+          <IconButton edge="end" size="small" onClick={toggleShowTime}>
+            { showTime? <AlarmOffIcon /> : <AlarmIcon /> }
+          </IconButton>
+      </InputAdornment>
+    )
+  }, [toggleShowTime, showTime]);
+
   const closeDialog = React.useCallback(() => {props.handleClose()}, [props]);
 
   React.useEffect(() => {
     setName(props.name);
     setNameError(false);
     setDate(props.date);
+    if (props.time !== "") {
+      setTime(parse(props.time, "HH:mm:ss", new Date()));
+    } else {
+      setTime(startOfHour(new Date()));
+    }
+    setShowTime(props.time !== "");
     setDone(props.done);
     const tag = props.tag === null ? "u": props.tag;
     setSelectedTagId(tag);
-  }, [props.name, props.date, props.done, props.tag])
+  }, [props.name, props.date, props.done, props.tag, props.time])
 
   return (
     <Dialog open={props.open? props.open:false} onClose={closeDialog} fullWidth keepMounted>
@@ -133,11 +159,25 @@ export default function ScheduleItemModal(props) {
             onAccept={(value) => {setDate(value)}}
             inputFormat="d MMM yyyy (E)"
             renderInput={(params) => {
+              params.InputProps.endAdornment = getTimeToggleButton();
               return <TextField size="small" variant="standard" fullWidth {...params} />}
             }
             reduceAnimations={true}
             keepMounted
           />
+          {showTime ? 
+            <MobileTimePicker
+              value={time}
+              label="Select time"
+              onChange={() => {}}
+              onAccept={(value) => {setTime(value)}}
+              inputFormat="h:mm aaa"
+              renderInput={(params) => {
+                return <TextField size="small" variant="standard" fullWidth {...params} />}
+              }
+              reduceAnimations={true}
+              keepMounted
+            /> : null}
           <FormControl fullWidth>
             <InputLabel size="small" variant="standard" id="tag-input-label">Tag</InputLabel>
             <Select size="small" 

@@ -10,6 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { format, parse } from 'date-fns';
+import { useCalendar } from '../services/calendar';
 
 
 export default function SearchModal(props) {
@@ -18,6 +19,7 @@ export default function SearchModal(props) {
   const [searchItems, setSearchItems] = React.useState([]);
   const [searchStr, setSearchStr] = React.useState("");
   const [, setGlobalData] = useGlobalData();
+  const { getTimeStr } = useCalendar();
 
   const handleRetrieveSearchItems = React.useCallback((data, searchStr) => {
     if (searchStr !== "") {
@@ -39,6 +41,10 @@ export default function SearchModal(props) {
     setSearchItems([]);
     setGlobalData((prev) => ({ ...prev, searchModalOpen: false, selectedDate: parse(item.date, "yyyy-MM-dd", new Date()) }))
   }, [setGlobalData, setSearchStr, setSearchItems])
+
+  const getItemText = React.useCallback((item) => {
+    return format(parse(item.date, "yyyy-MM-dd", new Date()), "d MMM yy (E)") + " - " + item.name + getTimeStr(item.time);
+  }, [getTimeStr]);
 
   const handleClose = React.useCallback(() => {
     setSearchStr("");
@@ -62,7 +68,7 @@ export default function SearchModal(props) {
           {searchItems.map((item) => (
             <ListItem key={item.id} disablePadding>
               <ListItemButton sx={{pr: 0}} onClick={() => handleSearchItemClick(item)}>
-                <ListItemText primary={format(parse(item.date, "yyyy-MM-dd", new Date()), "d MMM yy (E)") + " - " + item.name} />
+                <ListItemText primary={getItemText(item)} />
               </ListItemButton>
             </ListItem>
           ))}

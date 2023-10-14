@@ -26,13 +26,13 @@ import { useSlide } from '../services/slide';
 
 export default function WeeklyCalendar() {
 
-  const { getDateObjIn3Weeks, get3WeeksStartEndDateObj } = useCalendar();
+  const { getDateObjIn3Weeks, get3WeeksStartEndDateObj, getTimeStr } = useCalendar();
   const { get } = useHttp();
   const [globalData,] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
   let today = React.useRef(new Date());
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "done": false, "tag": "u"}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
@@ -146,14 +146,17 @@ export default function WeeklyCalendar() {
     setModalOpen(false);
   }, [openSnackbar, setModalOpen])
 
-  const truncateIfTooLong = React.useCallback((text) => {
+  const getChipLabel = React.useCallback((item) => {
+    let timeStr = getTimeStr(item.time);
     const max_length = 33;
-    if (text.length > 33) {
-      return text.substr(0, max_length-3) + "...";
+    let itemNameTruncated;
+    if (item.name.length + timeStr.length > max_length) {
+      itemNameTruncated = item.name.substr(0, max_length - timeStr.length - 3) + "...";
     } else {
-      return text;
+      itemNameTruncated = item.name;
     }
-  }, [])
+    return itemNameTruncated + timeStr;
+  }, [getTimeStr])
 
   const getSameDayStyle = React.useCallback((date) => {
     return {border: 0.5, borderColor: "grey.500", backgroundColor: isSameDay(date, today.current)? "LightYellow":"White"}
@@ -219,7 +222,7 @@ export default function WeeklyCalendar() {
                     <Box sx={{ p: 1 }}>
                       {data.items.map((item) => (
                         <React.Fragment key={item.id}>
-                          <Chip label={truncateIfTooLong(item.name)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
+                          <Chip label={getChipLabel(item)} size="small" color={item.done? "success": "primary"} onClick={() => openModal(item.id)} sx={{ fontWeight: "medium" }}></Chip>
                         </React.Fragment>
                       ))}
                     </Box>
@@ -236,6 +239,7 @@ export default function WeeklyCalendar() {
               <Stack alignItems="center">
                 <Button variant="outlined" size="small" sx={{mt: 1}} 
                   onClick={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
+                  onTouchEnd={() => {setSelectedDateForAll(today.current, selectedDateRef); handleRetrieveScheduleItems();}}
                   >Current week</Button>
               </Stack> : null
             }
@@ -248,6 +252,7 @@ export default function WeeklyCalendar() {
         name={modalItem.name} 
         type={modalItem.type} 
         date={modalItem.date}
+        time={modalItem.time}
         done={modalItem.done}
         tag={modalItem.tag}
         handleClose={(alertMsg, severity) => handleModalClose(alertMsg, severity)} />

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, add, sub, isEqual, isAfter } from 'date-fns';
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, add, sub, isEqual, isAfter, parse, format, getMinutes } from 'date-fns';
 
 export function useCalendar() {
   const getDateObjIn3Weeks = React.useCallback((selectedDate) => {
@@ -39,5 +39,14 @@ export function useCalendar() {
   const getDaysInWeek = React.useCallback(() => {
     return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   }, [])
-  return { getWeekStartEndDateObj, getDateObjIn3Weeks, get3WeeksStartEndDateObj, getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek }
+  const getTimeStr = React.useCallback((time) => {
+    if (time === "") return "";
+    let timeObj = parse(time, "HH:mm:ss", new Date());
+    if (getMinutes(timeObj) === 0) {
+      return format(timeObj, " (haaa)")
+    } else {
+      return format(timeObj, " (h:mmaaa)")
+    }
+  }, []);
+  return { getWeekStartEndDateObj, getDateObjIn3Weeks, get3WeeksStartEndDateObj, getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek, getTimeStr }
 }
