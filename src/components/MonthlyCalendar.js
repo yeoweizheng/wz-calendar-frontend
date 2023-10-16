@@ -191,7 +191,11 @@ export default function MonthlyCalendar() {
       <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center" sx={{mb: 1}}>
         <Stack direction="row" sx={{pt: 2}}>
-          <IconButton color="primary" onClick={gotoPrevMonth}><ArrowBackIcon /></IconButton>
+          <IconButton color="primary" 
+            onClick={gotoPrevMonth}
+            onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+            onTouchEnd={(e) => handleTouch(e, touchRef.current, gotoPrevMonth)} 
+            ><ArrowBackIcon /></IconButton>
           <MobileDatePicker
             value={selectedDateRef.current}
             label="Select month"
@@ -207,7 +211,11 @@ export default function MonthlyCalendar() {
             reduceAnimations={true}
             keepMounted
           />
-          <IconButton color="primary" onClick={gotoNextMonth}><ArrowForwardIcon /></IconButton>
+          <IconButton color="primary" 
+            onClick={gotoNextMonth}
+            onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+            onTouchEnd={(e) => handleTouch(e, touchRef.current, gotoNextMonth)} 
+            ><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
       <Swiper loop={true} preventClicks={false} preventClicksPropagation={false} speed={200}

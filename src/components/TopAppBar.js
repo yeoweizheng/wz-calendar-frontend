@@ -10,12 +10,15 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useAuth } from "../services/auth";
 import { useGlobalData } from '../services/globalData';
 import { useNav } from '../services/nav';
+import { useTouch } from '../services/touch';
 
 export default function TopAppBar() {
 
   const { isAuthenticated } = useAuth();
   const [globalData, setGlobalData] = useGlobalData();
   const { ensureCalView } = useNav();
+  const { registerTouch, handleTouch, defaultTouchRef } = useTouch();
+  const touchRef = React.useRef(defaultTouchRef());
 
   const toggleSidebar = React.useCallback(() => {
     setGlobalData((prev) => ({ ...prev, sidebarOpen: !prev.sidebarOpen }))
@@ -36,14 +39,26 @@ export default function TopAppBar() {
       <AppBar position="fixed">
         <Toolbar variant="dense">
           {isAuthenticated() ?
-            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={toggleSidebar}> <MenuIcon /> </IconButton>
+            <IconButton color="inherit" edge="start" sx={{ mr: 2 }} 
+              onClick={toggleSidebar}
+              onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+              onTouchEnd={(e) => handleTouch(e, touchRef.current, toggleSidebar)} 
+              > <MenuIcon /> </IconButton>
             : null
           }
           <Typography variant="h6" component="div" sx={{ flex: 1 }}> Calendar </Typography>
           {isAuthenticated() ?
             <React.Fragment>
-              <IconButton color="inherit" edge="start" sx={{ mr: 2 }} onClick={openSearchModal}> <SearchIcon /> </IconButton>
-              <IconButton color="inherit" onClick={toggleCalView}> {globalData.calView === "weekly" ? <CalendarViewMonthIcon /> : <CalendarTodayIcon />} </IconButton>
+              <IconButton color="inherit" edge="start" sx={{ mr: 2 }} 
+                onClick={openSearchModal}
+                onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                onTouchEnd={(e) => handleTouch(e, touchRef.current, openSearchModal)} 
+                > <SearchIcon /> </IconButton>
+              <IconButton color="inherit" 
+                onClick={toggleCalView}
+                onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                onTouchEnd={(e) => handleTouch(e, touchRef.current, toggleCalView)} 
+                > {globalData.calView === "weekly" ? <CalendarViewMonthIcon /> : <CalendarTodayIcon />} </IconButton>
             </React.Fragment>
             : null
           }

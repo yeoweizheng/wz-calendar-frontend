@@ -188,7 +188,11 @@ export default function WeeklyCalendar() {
       <Fade in={loading}><LinearProgress /></Fade>
       <Stack alignItems="center">
         <Stack direction="row" sx={{pt: 2}}>
-          <IconButton color="primary" onClick={gotoPrevWeek}><ArrowBackIcon /></IconButton>
+          <IconButton color="primary"
+            onClick={gotoPrevWeek}
+            onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+            onTouchEnd={(e) => handleTouch(e, touchRef.current, gotoPrevWeek)} 
+            ><ArrowBackIcon /></IconButton>
           <MobileDatePicker
             value={selectedDateRef.current}
             label="Select week"
@@ -204,7 +208,11 @@ export default function WeeklyCalendar() {
             reduceAnimations={true}
             keepMounted
           />
-          <IconButton color="primary" onClick={gotoNextWeek}><ArrowForwardIcon /></IconButton>
+          <IconButton color="primary" 
+            onClick={gotoNextWeek}
+            onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+            onTouchEnd={(e) => handleTouch(e, touchRef.current, gotoNextWeek)} 
+            ><ArrowForwardIcon /></IconButton>
         </Stack>
       </Stack>
       <Swiper loop={true} preventClicks={false} preventClicksPropagation={false} speed={200}
