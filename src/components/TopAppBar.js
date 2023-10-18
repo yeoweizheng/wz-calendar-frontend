@@ -18,6 +18,7 @@ export default function TopAppBar() {
   const [globalData, setGlobalData] = useGlobalData();
   const { ensureCalView } = useNav();
   const { registerTouch, handleTouch, defaultTouchRef } = useTouch();
+  const today = React.useRef(new Date());
   const touchRef = React.useRef(defaultTouchRef());
 
   const toggleSidebar = React.useCallback(() => {
@@ -31,7 +32,7 @@ export default function TopAppBar() {
 
   const toggleCalView = React.useCallback(() => {
     let calView = globalData.calView === "weekly" ? "monthly" : "weekly";
-    setGlobalData((prev) => ({ ...prev, calView: calView }));
+    setGlobalData((prev) => ({ ...prev, calView: calView, selectedDate: today.current }));
   }, [setGlobalData, globalData.calView])
 
   return (

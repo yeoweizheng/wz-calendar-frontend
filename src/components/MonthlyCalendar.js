@@ -2,7 +2,7 @@ import * as React from 'react';
 import Container from '@mui/material/Container';
 import { useGlobalData } from '../services/globalData';
 import { useCalendar } from '../services/calendar';
-import { format, isSameDay, add, sub, startOfMonth, isSameMonth, isBefore, startOfWeek, endOfWeek, isWithinInterval, endOfMonth } from 'date-fns';
+import { format, isSameDay, add, sub, startOfMonth, isSameMonth, startOfWeek, endOfWeek, isWithinInterval, endOfMonth, parse } from 'date-fns';
 import { useHttp } from '../services/http';
 import Grid from '@mui/material/Grid';
 import { Typography } from '@mui/material';
@@ -20,16 +20,22 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { useSlide } from '../services/slide';
 import { useTouch } from '../services/touch';
+import ScheduleItemModal from './ScheduleItemModal';
+import { useSnackbar } from '../services/snackbar';
 
 export default function MonthlyCalendar() {
-  const [globalData, setGlobalData] = useGlobalData();
+  const [globalData] = useGlobalData();
   const {getDateObjIn3Months, get3MonthsStartEndDateObj, getDaysInWeek, getTimeStr} = useCalendar();
   const [displayData, setDisplayData] = React.useState([]);
   const { get } = useHttp();
   const theme = useTheme();
-  let today = React.useRef(new Date());
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const today = React.useRef(new Date());
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "done": false, "tag": "u"}
+  const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderMonthPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
+  const {openSnackbar} = useSnackbar();
   const [loading, setLoading] = React.useState(false);
   const slideIndex = React.useRef(0);
   const { getPrevSlideIndex, getNextSlideIndex } = useSlide();
@@ -117,28 +123,42 @@ export default function MonthlyCalendar() {
   }, [gotoPrevMonth])
 
   const handleKeyUp = React.useCallback((e) => {
-    if (loading || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
+    if (loading || modalOpen || globalData.tagModalOpen || datePickerOpen || globalData.sidebarOpen) return;
     if (e.keyCode === 37) {
       gotoPrevMonth();
     } else if (e.keyCode === 39) {
       gotoNextMonth();
     }
-  }, [gotoPrevMonth, gotoNextMonth, loading, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
+  }, [gotoPrevMonth, gotoNextMonth, loading, modalOpen, globalData.tagModalOpen, datePickerOpen, globalData.sidebarOpen])
 
-  const gotoWeek = React.useCallback((date) => {
-    if (!isSameMonth(selectedDateRef.current, date)) {
-      if (isBefore(date, selectedDateRef.current)) {
-        date = endOfWeek(date);
-      } else {
-        date = startOfWeek(date);
+  const openModal = (id, date) => {
+    if (date) {  // specify date for create modal
+      let modalItem = {...defaultModalItem};
+      modalItem.date = date;
+      modalItem.tag = globalData.selectedTagId === "a"? "u" : globalData.selectedTagId;
+      setModalItem(modalItem);
+    } else {
+      for (let item of scheduleItems.current) {
+        if (id === item.id) {
+          let modalItem = {...item};
+          modalItem["type"] = "edit";
+          modalItem["date"] = parse(item["date"], "yyyy-MM-dd", new Date());
+          setModalItem(modalItem);
+        }
       }
     }
-    setSelectedDateForAll(date, selectedDateRef);
-    setGlobalData((prev) => ({...prev, calView: "weekly"}))
-  }, [setSelectedDateForAll, setGlobalData]);
+    setModalOpen(true);
+  }
+
+  const handleModalClose = React.useCallback((alertMsg=null, severity=null) => {
+    if (alertMsg !== null && severity !== null) {
+      openSnackbar(alertMsg, severity);
+    }
+    setModalOpen(false);
+  }, [openSnackbar, setModalOpen])
 
   const getItemStyle = React.useCallback((item) => {
-    let baseCSS = {display: "block", lineHeight: "1.2em", color: "white", borderRadius: "3px", my: 0.2, px: 0.2, py: 0.1}
+    let baseCSS = {display: "block", lineHeight: "1.2em", color: "white", borderRadius: "3px", my: 0.2, px: 0.2, py: 0.1, cursor: "pointer"}
     if (item.done) {
       baseCSS["background"] = theme.palette.success.main;
     } else {
@@ -178,8 +198,8 @@ export default function MonthlyCalendar() {
 
   React.useEffect(() => {
     if (!isSameDay(selectedDateRef.current, globalData.selectedDate)) selectedDateRef.current = globalData.selectedDate;
-    retrieveScheduleItems(globalData.selectedDate);
-  }, [retrieveScheduleItems, globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen]);
+    if (!modalOpen) retrieveScheduleItems(globalData.selectedDate);
+  }, [retrieveScheduleItems, globalData.selectedDate, globalData.selectedTagId, globalData.tagModalOpen, modalOpen]);
 
   React.useEffect(() => {
     window.document.addEventListener('keyup', handleKeyUp);
@@ -233,15 +253,20 @@ export default function MonthlyCalendar() {
             {displayData.filter((weekData) => weekData[0].slideIndices.includes(slideIndex)).map((weekData) => (
               <Grid container justifyContent="space-evenly" sx={{minHeight: "6.5em"}} key={"week-"+weekData[0].date}>
                 {weekData.map((dayData) => (
-                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} 
-                    onClick={() => gotoWeek(dayData.date)} key={slideIndex+"-date-"+dayData.date}
-                    onTouchStart={(e) => registerTouch(e, touchRef.current)} 
-                    onTouchEnd={(e) => handleTouch(e, touchRef.current, () => gotoWeek(dayData.date))} 
-                    >
-                    <Typography variant="body2" component="p" align="center" fontWeight="medium">{dayData.day}</Typography>
+                  <Grid item zeroMinWidth sx={getDayStyle(dayData.date, dayData.slideIndices, slideIndex)} key={slideIndex+"-date-"+dayData.date}>
+                    <Typography variant="body2" component="p" align="center" fontWeight="medium"
+                      sx={{cursor: "pointer"}}
+                      onClick={() => openModal(0, dayData.date)}
+                        onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                        onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(0, dayData.date))} 
+                      >{dayData.day}</Typography>
                     {dayData.items.map((item) => (
                       <React.Fragment key={item.id}>
-                        <Typography noWrap variant="caption" fontWeight="400" sx={getItemStyle(item)}>{item.name+getTimeStr(item.time)}</Typography>
+                        <Typography noWrap variant="caption" fontWeight="400" 
+                          onClick={() => openModal(item.id)}
+                          onTouchStart={(e) => registerTouch(e, touchRef.current)} 
+                          onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(item.id))} 
+                          sx={getItemStyle(item)}>{item.name+getTimeStr(item.time)}</Typography>
                       </React.Fragment>
                     ))}
                   </Grid>
@@ -260,6 +285,16 @@ export default function MonthlyCalendar() {
           </SwiperSlide>
         ))}
       </Swiper>
+      <ScheduleItemModal 
+        open={modalOpen} 
+        id={modalItem.id} 
+        name={modalItem.name} 
+        type={modalItem.type} 
+        date={modalItem.date}
+        time={modalItem.time}
+        done={modalItem.done}
+        tag={modalItem.tag}
+        handleClose={(alertMsg, severity) => handleModalClose(alertMsg, severity)} />
     </Container>
   )
 }

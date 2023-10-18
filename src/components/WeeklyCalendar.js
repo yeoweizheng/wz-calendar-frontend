@@ -32,7 +32,7 @@ export default function WeeklyCalendar() {
   const [globalData,] = useGlobalData();
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
-  let today = React.useRef(new Date());
+  const today = React.useRef(new Date());
   const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
