@@ -5,14 +5,15 @@ import MonthlyCalendar from './MonthlyCalendar';
 import Settings from './Settings';
 import SearchModal from './SearchModal';
 import { useGlobalData } from '../services/globalData';
-import { isMobile } from 'react-device-detect';
+import { useNav } from '../services/nav';
 
 export default function MainContainer() {
-  const [globalData, setGlobalData] = useGlobalData();
+  const [globalData,] = useGlobalData();
+  const { switchToCalView } = useNav();
 
   React.useEffect(() => {
-    if (!isMobile) setGlobalData((prev) => ({ ...prev, calView: "monthly"}))
-  }, [setGlobalData]);
+    switchToCalView();
+  }, [switchToCalView]);
 
   return (
     <React.Fragment>
