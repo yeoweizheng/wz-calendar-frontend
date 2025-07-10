@@ -33,6 +33,7 @@ export default function ScheduleItemModal(props) {
   const [nameError, setNameError] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
   const [time, setTime] = React.useState(startOfHour(new Date()));
+  const [notes, setNotes] = React.useState(props.notes);
   const [done, setDone] = React.useState(false);
   const [showTime, setShowTime] = React.useState(false);
   const {post, patch, del} = useHttp()
@@ -57,6 +58,7 @@ export default function ScheduleItemModal(props) {
       "name": name,
       "date": format(date, "yyyy-MM-dd"),
       "time": showTime ? format(time, "HH:mm:ss") : "",
+      "notes": notes,
       "done": done,
       "tag": tagId
     }
@@ -65,11 +67,15 @@ export default function ScheduleItemModal(props) {
     } else {
       post(baseUrl, payload, (data) => props.handleClose("Created " + data.name, "success"));
     }
-  }, [name, post, patch, props, baseUrl, patchUrl, date, done, selectedTagId, showTime, time])
+  }, [name, post, patch, props, baseUrl, patchUrl, date, notes, done, selectedTagId, showTime, time])
 
   const handleNameChange = React.useCallback((e) => {
     setNameError(false);
     setName(e.target.value);
+  }, []);
+
+  const handleNotesChange = React.useCallback((e) => {
+    setNotes(e.target.value);
   }, []);
 
   const handleSelectedTagId = React.useCallback((e) => {
@@ -120,10 +126,11 @@ export default function ScheduleItemModal(props) {
       setTime(startOfHour(new Date()));
     }
     setShowTime(props.time !== "");
+    setNotes(props.notes);
     setDone(props.done);
     const tag = props.tag === null ? "u": props.tag;
     setSelectedTagId(tag);
-  }, [props.name, props.date, props.done, props.tag, props.time])
+  }, [props.name, props.date, props.notes, props.done, props.tag, props.time])
 
   return (
     <Dialog open={props.open? props.open:false} onClose={closeDialog} fullWidth keepMounted>
@@ -196,6 +203,15 @@ export default function ScheduleItemModal(props) {
               ))}
             </Select>
           </FormControl>
+          <TextField
+            label="Notes"
+            value={notes}
+            size="small"
+            fullWidth
+            onChange={(e) => handleNotesChange(e)}
+            variant="standard"
+            multiline
+          />
           { props.type === "edit" ?
             <FormGroup>
               <FormControlLabel sx={{mt: 0.5, mb: 0.5}} control={<Checkbox sx={{pt: 0, pb: 0}} checked={done} onChange={(e) => setDone(e.target.checked)}/>} label="Done" />

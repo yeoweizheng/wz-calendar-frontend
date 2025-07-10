@@ -11,6 +11,7 @@ import MobileDatePicker from '@mui/lab/MobileDatePicker';
 import IconButton from '@mui/material/IconButton';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import NotesIcon from '@mui/icons-material/Notes';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { useCustomDay } from '../services/customday';
@@ -31,7 +32,7 @@ export default function MonthlyCalendar() {
   const theme = useTheme();
   const [modalOpen, setModalOpen] = React.useState(false);
   const today = React.useRef(new Date());
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "done": false, "tag": "u"}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "notes": "", "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderMonthPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
@@ -266,7 +267,10 @@ export default function MonthlyCalendar() {
                           onClick={() => openModal(item.id)}
                           onTouchStart={(e) => registerTouch(e, touchRef.current)} 
                           onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(item.id))} 
-                          sx={getItemStyle(item)}>{item.name+getTimeStr(item.time)}</Typography>
+                          sx={getItemStyle(item)}>
+                          {item.notes === "" ? null : <NotesIcon sx={{ fontSize: "inherit", verticalAlign: "middle", mr: "0.1rem" }} />}
+                          {item.name+getTimeStr(item.time)}
+                        </Typography>
                       </React.Fragment>
                     ))}
                   </Grid>
@@ -292,6 +296,7 @@ export default function MonthlyCalendar() {
         type={modalItem.type} 
         date={modalItem.date}
         time={modalItem.time}
+        notes={modalItem.notes}
         done={modalItem.done}
         tag={modalItem.tag}
         handleClose={(alertMsg, severity) => handleModalClose(alertMsg, severity)} />

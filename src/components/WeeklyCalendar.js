@@ -13,6 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import NotesIcon from '@mui/icons-material/Notes';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useGlobalData } from '../services/globalData';
@@ -33,7 +34,7 @@ export default function WeeklyCalendar() {
   const [displayData, setDisplayData] = React.useState([]);
   const [modalOpen, setModalOpen] = React.useState(false);
   const today = React.useRef(new Date());
-  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "done": false, "tag": "u"}
+  const defaultModalItem = {"id": 0, "name": "", "type": "create", "date": today.current, "time": "", "notes": "", "done": false, "tag": "u"}
   const [modalItem, setModalItem] = React.useState(defaultModalItem);
   const [datePickerOpen, setDatePickerOpen] = React.useState(false);
   const {renderWeekPickerDay, setCustomDayValue, setSelectedDateForAll} = useCustomDay();
@@ -234,6 +235,7 @@ export default function WeeklyCalendar() {
                       {data.items.map((item) => (
                         <React.Fragment key={item.id}>
                           <Chip label={getChipLabel(item)} size="small" color={item.done? "success": "primary"} 
+                            icon={item.notes === "" ? null : <NotesIcon />}
                             onClick={() => openModal(item.id)} 
                             onTouchStart={(e) => registerTouch(e, touchRef.current)} 
                             onTouchEnd={(e) => handleTouch(e, touchRef.current, () => openModal(item.id))} 
@@ -273,6 +275,7 @@ export default function WeeklyCalendar() {
         name={modalItem.name} 
         type={modalItem.type} 
         date={modalItem.date}
+        notes={modalItem.notes}
         time={modalItem.time}
         done={modalItem.done}
         tag={modalItem.tag}
