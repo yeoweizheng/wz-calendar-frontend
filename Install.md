@@ -1,14 +1,14 @@
 ### Run
-npm start
+- npm start
 
 ### Build
-npm run build
+- npm run build
 
 ### Archive
-npm install -g npm-pack-all
-npm-pack-all
+- npm install -g npm-pack-all
+- npm-pack-all
 
-### Restoring archive
-tar -xvf wz-calendar-frontend-0.1.0.tgz
-npm i react-scripts
-(run / build as normal)
+### Restoring from archive
+- tar -xvf wz-calendar-frontend-0.1.0.tgz
+- npm i react-scripts
+- (run / build as normal)
