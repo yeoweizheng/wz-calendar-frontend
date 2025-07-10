@@ -5,8 +5,7 @@
 - npm run build
 
 ### Archive
-- npm install -g npm-pack-all
-- npm-pack-all
+- npx npm-pack-all
 
 ### Restoring from archive
 - npm install -g pnpm (faster alternative than npm)

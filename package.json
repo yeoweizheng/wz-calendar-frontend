@@ -15,6 +15,7 @@
     "date-fns": "^2.28.0",
     "history": "^5.2.0",
     "moment": "^2.29.1",
+    "npm-pack-all": "^1.12.7",
     "react": "^17.0.2",
     "react-cookie": "^4.1.1",
     "react-device-detect": "^2.2.3",
